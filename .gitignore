@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+data/raw/*
+data/interim/*
+data/processed/*
+data/custom/*
+
+# Model files
+models/
+*.bin
+*.pt
+*.pth
+*.safetensors
+
+# Experiment outputs
+results/logs/*
+results/figures/*
+results/tables/*
+
+# Secrets
+.env
+*.key
