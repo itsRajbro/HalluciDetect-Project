@@ -1,0 +1,44 @@
+{
+  "model_id": "Qwen/Qwen3-4B",
+  "model_revision": null,
+  "load_status": "success",
+  "dtype": "torch.bfloat16",
+  "device": "cuda",
+  "load_time_sec": 23.71,
+  "peak_vram_mb": 2642.33,
+  "ram_mb": 1598.25,
+  "generation_time_sec": 106.76,
+  "english_output": "<think>\nOkay, the user is asking for the capital of France. I need to make sure I provide the correct answer. Let me think... France is a country in Europe. The capital is Paris. Wait, is there any chance I might be wrong? Maybe they're trying to trick me? No, Paris is definitely the capital. I should confirm that. Yeah, Paris is the capital city of France. The user wants the answer in one sentence, so I'll just state that clearly.\n</think>\n\nThe capital of France is Paris.",
+  "hindi_output": "<think>\nOkay, the user is asking for the capital of India in one sentence. Let me make sure I get that right. The capital of India is New Delhi. I need to confirm that there's no confusion with other cities like Mumbai or Bangalore. Yes, New Delhi is the capital. I should state that clearly in a single sentence. Maybe also mention that it's the administrative center. Wait, the question is straightforward, so just the answer. Let me check if there's any recent change, but I don't think so. So the answer is New Delhi.\n</think>\n\nभारत की राजधानी नई दिल्ली है।",
+  "roman_hindi_output": "<think>\nOkay, the user is asking for the answer to \"Bharat ki rajdhani kya hai?\" which means \"What is the capital of India?\" in one sentence. I need to make sure I provide the correct answer. The capital of India is New Delhi. I should confirm that there's no confusion with other cities like Mumbai or Bangalore. Also, the user wants the answer in a single sentence, so I'll structure it as \"Bharat ki rajdhani New Delhi hai.\" Let me check if there's any recent change or if there's any alternative name. No, New Delhi is the official capital. I should also ensure that the answer is concise and accurate.\n</think>\n\nBharat ki rajdhani New Delhi hai।",
+  "hinglish_output": "<think>\nOkay, the user is asking for the capital of India. I need to make sure I provide the correct answer. Let me recall, the capital of India is New Delhi. Wait, but sometimes people might confuse it with Mumbai or Kolkata. No, New Delhi is the correct one. Let me double-check. Yes, New Delhi is the capital. I should answer in one short sentence. So, the answer is New Delhi. Make sure to mention it's the capital. Alright, that's straightforward.\n</think>\n\nIndia ki capital New Delhi hai।",
+  "uncertainty_output": "<think>\nOkay, the user is asking who the first person to walk on Mars was. Let me think. First, I need to recall if there's any historical figure who actually walked on Mars. Wait, Mars is a planet, so the question is about a real person. But in reality, no one has walked on Mars yet. The question is a bit of a trick, maybe a riddle.\n\nWait, the user might be referring to a fictional scenario. For example, in science fiction, there are characters like Mark Watney from \"The Martian,\" but that's a movie. Or maybe a historical figure? No, there's no such person. The first person to walk on Mars would be a fictional character, but the user is asking if there's a real person. \n\nAlternatively, maybe the user is confused. The first person to walk on Mars would be a person who has been to Mars, but as of now, no human has been to Mars. The first mission to Mars was NASA's Mariner 9 in 1971, which was a spacecraft. Then there's the Mars rovers like Curiosity, Perseverance, but those are robots. \n\nSo the answer is that there is no real person who has walked on Mars. The premise is false. The user might be testing if I know that. So I should explain that no one has walked on Mars yet, and that the question is based on a false premise.\n</think>\n\nThe premise that \"the first person to walk on Mars\" is false. As of now (2023), no human has walked on Mars. Mars has not been visited by humans, and no mission has successfully landed a human on its surface. The first human missions to Mars remain speculative and are not part of current scientific or historical records. The question is based on a false premise.",
+  "logits_available": true,
+  "logits_shape": [
+    1,
+    12,
+    151936
+  ],
+  "logits_dtype": "torch.bfloat16",
+  "hidden_states_available": true,
+  "hidden_states_shape": [
+    1,
+    12,
+    2560
+  ],
+  "hidden_state_layers": 37,
+  "hidden_states_dtype": "torch.bfloat16",
+  "notes": [],
+  "quantization": "4bit-nf4",
+  "timestamp_utc": "2026-09-17T04:42:55.338830+00:00",
+  "generation_settings": {
+    "max_new_tokens": 512,
+    "do_sample": false,
+    "num_beams": 1,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "thinking_disabled_requested": false
+  },
+  "tokens_per_sec_approx": 8.46
+}

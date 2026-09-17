@@ -1,7 +1,7 @@
 # HalluciDetect - Current Project Status
 
-**Last Updated:** 2026-09-02  
-**Current Phase:** Foundation Complete → Model Development Phase
+**Last Updated:** 2026-09-17  
+**Current Phase:** Foundation Complete → Base Model Selected; Model Development Pending
 
 ---
 
@@ -41,6 +41,28 @@ HalluciDetect is a research project investigating automated hallucination detect
 - Code: `src/data/run_eda.py`
 - Notebooks: `notebooks/01_dataset_exploration.ipynb`, `notebooks/03_eda.ipynb`
 - Documented in: `docs/eda.md`
+### Phase 2: Base Model Identification and Selection (Complete)
+
+#### 5. Candidate Model Evaluation ✓
+- Evaluated Qwen3-4B, Gemma 3 4B IT, and Llama 3.2 3B Instruct
+- Benchmarked on the project's RTX 3050 6 GB GPU
+- Verified 4-bit NF4 feasibility
+- Compared VRAM usage, RAM usage, and generation throughput
+- Tested English, Hindi, Roman Hindi, Hinglish, and false-premise handling
+- Verified logits and hidden-state access
+- Documented Qwen3 thinking-mode behavior
+- Benchmark code: `src/models/model_identification.py`
+- Results: `results/model_identification/`
+- Documentation: `docs/model_selection.md`
+
+#### 6. Final Base Model Selection ✓
+- Selected **Llama 3.2 3B Instruct**
+- Selected runtime configuration: **4-bit NF4**
+- Measured 4-bit peak VRAM: 2,178 MB
+- Measured 4-bit generation throughput: 10.92 tok/s
+- English, Hindi, Roman Hindi, and Hinglish tests passed
+- Logits and hidden-state access verified
+- Selection rationale documented in `docs/model_selection.md`
 
 ---
 
@@ -99,36 +121,31 @@ HalluciDetect is a research project investigating automated hallucination detect
 
 ### Immediate Tasks
 
-1. **Base LLM Selection**
-   - Hardware assessment
-   - Model comparison (parameters, VRAM, capabilities)
-   - Hidden-state access verification (required for SEP)
-   - Selection justification
-   - Document in: `docs/model_selection.md`
+Model development has **not yet started**. The following items remain pending:
 
-2. **Baseline Implementation**
+1. **Baseline Implementation**
    - Simple classification baseline
    - Length-only baseline (for bias quantification)
    - Fine-tuned transformer baseline
 
-3. **Evaluation Framework**
+2. **Evaluation Framework**
    - Standard metrics (accuracy, F1, precision, recall)
    - Length-controlled evaluation
    - Attention analysis tools
 
 ### Future Phases
 
-4. **Semantic Entropy Implementation**
+3. **Semantic Entropy Implementation**
    - Multiple generation sampling
    - Semantic clustering
    - Entropy calculation
 
-5. **SEP Development**
+4. **SEP Development**
    - Hidden-state extraction
    - Probe training
    - Performance comparison
 
-6. **System Integration**
+5. **System Integration**
    - Hybrid detection approach
    - Production pipeline
    - Multilingual extension
@@ -142,7 +159,7 @@ HalluciDetect-Project/
 ├── data/                    # Datasets (raw, interim, processed)
 ├── src/
 │   ├── data/               # Data processing code ✓
-│   ├── models/             # Model implementations (pending)
+│   ├── models/             # Model identification/selected base-model configuration ✓
 │   ├── semantic_entropy/   # SE implementation (pending)
 │   └── sep/               # SEP implementation (pending)
 ├── notebooks/              # Research notebooks ✓
@@ -213,11 +230,19 @@ This is a collaborative research project with 5 team members:
 ## Status Summary
 
 **Foundation Phase:** ✓ Complete  
-**Model Development Phase:** → In Progress  
-**Advanced Methods Phase:** Planned  
-**Extensions Phase:** Future Work
+**Base Model Identification & Selection:** ✓ Complete  
+**Model Development:** Pending  
+**Advanced Methods (SE/SEP):** Planned  
+**Extensions:** Future Work
 
-All preprocessing and exploratory analysis is complete. The dataset is production-ready for model training and experimentation.
+---
+
+The dataset foundation, preprocessing, splitting, EDA, model benchmarking, and base-model selection are complete.
+
+**Selected base model:** Llama 3.2 3B Instruct  
+**Selected runtime:** 4-bit NF4
+
+Semantic Entropy, SEP, detector implementation, training, and downstream evaluation have not yet started.
 
 ---
 
