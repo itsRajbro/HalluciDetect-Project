@@ -1,0 +1,44 @@
+{
+  "model_id": "Qwen/Qwen3-4B",
+  "model_revision": null,
+  "load_status": "success",
+  "dtype": "torch.bfloat16",
+  "device": "cuda",
+  "load_time_sec": 23.04,
+  "peak_vram_mb": 7734.78,
+  "ram_mb": 3629.03,
+  "generation_time_sec": 184.64,
+  "english_output": "<think>\nOkay, the user is asking for the capital of France. I need to make sure I answer correctly. Let me think. France is a country in Europe, and I remember that its capital is Paris. But wait, I should double-check that. Sometimes people might confuse it with other cities like Lyon or Marseille, but no, those are major cities but not the capital. Paris is definitely the capital. The user wants the answer in one sentence, so I should just state it clearly. Maybe add a bit more context to confirm, but keep it concise. Yeah, \"The capital of France is Paris.\" That's straightforward and",
+  "hindi_output": "<think>\nOkay, the user is asking for the capital of India in one sentence. Let me make sure I get that right. The capital of India is New Delhi. I should confirm that there's no confusion with other cities like Mumbai or Bangalore. Yes, New Delhi is the capital. I need to present the answer clearly and concisely. Just a single sentence, so I'll state it directly.\n</think>\n\nभारत की राजधानी नई दिल्ली है।",
+  "roman_hindi_output": "<think>\nOkay, the user is asking for the answer to \"Bharat ki rajdhani kya hai?\" in one sentence. Let me start by recalling that \"rajdhani\" means the capital city of a country. So, the question is asking for the capital of India.\n\nI know that the capital of India is New Delhi. But wait, I should make sure there's no confusion with other cities like Mumbai or Kolkata. No, New Delhi is definitely the capital. Let me confirm that. Yes, the Government of India has its headquarters in New Delhi, and it's the capital city. So the answer should be",
+  "hinglish_output": "<think>\nOkay, the user is asking for the capital of India. I need to make sure I provide the correct answer. Let me recall, the capital of India is New Delhi. Wait, but sometimes people might confuse it with Delhi, the national capital territory. But the official capital is New Delhi. I should confirm that. Yes, New Delhi is the capital city, while Delhi is the union territory. So the answer should be New Delhi. The user wants a short sentence, so I'll just state that clearly.\n</think>\n\nIndia ki capital New Delhi hai।",
+  "uncertainty_output": "<think>\nOkay, the user is asking who was the first person to walk on Mars. Let me start by recalling what I know. Mars is the fourth planet from the Sun, and as of now, no human has set foot there. The question is whether there's a known person who has done that, or if the premise is false.\n\nFirst, I need to check if there's any confirmed human mission to Mars. From what I remember, NASA's Mars missions have been robotic, like the rovers Spirit, Opportunity, Curiosity, and Perseverance. These are unmanned vehicles that have explored the surface. There's also",
+  "logits_available": true,
+  "logits_shape": [
+    1,
+    12,
+    151936
+  ],
+  "logits_dtype": "torch.bfloat16",
+  "hidden_states_available": true,
+  "hidden_states_shape": [
+    1,
+    12,
+    2560
+  ],
+  "hidden_state_layers": 37,
+  "hidden_states_dtype": "torch.bfloat16",
+  "notes": [
+    "peak_vram_mb (7735 MB) is at or above typical 6GB-card physical capacity (~6144 MB). If load_time_sec was also unusually high, this likely reflects overflow into shared/system memory rather than a clean in-VRAM fit. Consider re-running with --load-in-4bit for an honest fit check on 6GB VRAM."
+  ],
+  "quantization": "none",
+  "timestamp_utc": "2026-09-16T19:56:40.434585+00:00",
+  "generation_settings": {
+    "max_new_tokens": 128,
+    "do_sample": false,
+    "num_beams": 1,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null
+  }
+}

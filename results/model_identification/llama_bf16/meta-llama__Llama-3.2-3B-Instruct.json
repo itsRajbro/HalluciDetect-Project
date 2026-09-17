@@ -1,0 +1,48 @@
+{
+  "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+  "model_revision": null,
+  "load_status": "success",
+  "dtype": "torch.bfloat16",
+  "model_class_used": "AutoModelForCausalLM",
+  "device": "cuda",
+  "load_time_sec": 424.71,
+  "peak_vram_mb": 6156.96,
+  "ram_mb": 1809.27,
+  "generation_time_sec": 16.48,
+  "english_output": "The capital of France is Paris.",
+  "hindi_output": "भारत की राजधानी नई दिल्ली है।",
+  "roman_hindi_output": "Bharat ki rajdhani New Delhi hai.",
+  "hinglish_output": "New Delhi India ki capital hai.",
+  "uncertainty_output": "The premise is false. To date, no human has walked on Mars. While there have been several robotic missions to Mars, including rovers like NASA's Curiosity and Perseverance, as well as landers and orbiters from various countries and organizations, no human has traveled to or walked on the planet.",
+  "logits_available": true,
+  "logits_shape": [
+    1,
+    13,
+    128256
+  ],
+  "logits_dtype": "torch.bfloat16",
+  "hidden_states_available": true,
+  "hidden_states_shape": [
+    1,
+    13,
+    3072
+  ],
+  "hidden_state_layers": 29,
+  "hidden_states_dtype": "torch.bfloat16",
+  "notes": [
+    "peak_vram_mb (6157 MB) is at or above typical 6GB-card physical capacity (~6144 MB). If load_time_sec was also unusually high, this likely reflects overflow into shared/system memory rather than a clean in-VRAM fit. Consider re-running with --load-in-4bit for an honest fit check on 6GB VRAM.",
+    "Approx generation speed (6.67 tok/s) is unusually slow for a GPU-resident model of this size, and peak_vram_mb (6157 MB) is at/above typical 6GB-card capacity. Together this is consistent with VRAM overflow into shared/system memory rather than a clean in-VRAM fit."
+  ],
+  "quantization": "none",
+  "timestamp_utc": "2026-09-17T08:57:45.304804+00:00",
+  "generation_settings": {
+    "max_new_tokens": 512,
+    "do_sample": false,
+    "num_beams": 1,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "thinking_disabled_requested": false
+  },
+  "tokens_per_sec_approx": 6.67
+}
