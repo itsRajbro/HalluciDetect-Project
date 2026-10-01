@@ -17,7 +17,9 @@ HalluciDetect is a research initiative aimed at developing automated methods for
 
 ---
 
-## Current Phase: Data Foundation
+## Current Phase: Evaluation & Model Development
+
+The data foundation is complete, and the project has now entered the evaluation/model-development phase. The original test set remains the primary benchmark, with a frozen length-controlled subset used as a secondary robustness test.
 
 ### Completed Work
 
@@ -44,6 +46,18 @@ HalluciDetect is a research initiative aimed at developing automated methods for
 - Identified potential dataset biases (length correlation)
 - Generated publication-ready visualizations
 
+#### ✅ Length-Controlled Test Set
+- Implemented deterministic one-to-one factual/hallucinated matching
+- Matching criterion: answer character length using `len(answer)`
+- Frozen tolerance: **δ = 1 character**
+- Generated `data/processed/test_length_controlled.jsonl`
+- Controlled set: **274 samples (137 factual, 137 hallucinated)**
+- Coverage: **13.70%** of the original test set
+- Mean absolute length gap: **0.175 characters**
+- Maximum absolute length gap: **1 character**
+- All artifact integrity checks passed
+- Original `test.jsonl` remains unchanged and is still the primary benchmark
+
 ---
 
 ## Dataset
@@ -56,6 +70,9 @@ HalluciDetect is a research initiative aimed at developing automated methods for
 - **Size:** 10,000 question-answer pairs → 20,000 binary samples
 - **Splits:** Train (15,998), Validation (2,002), Test (2,000)
 - **Class Balance:** Perfect 50/50 distribution
+- **Primary test benchmark:** `data/processed/test.jsonl`
+- **Secondary controlled benchmark:** `data/processed/test_length_controlled.jsonl`
+- **Controlled benchmark:** 274 samples, 137 factual + 137 hallucinated, matched within 1 character
 
 ### Dataset Structure
 
@@ -81,7 +98,8 @@ HalluciDetect-Project/
 │   ├── data/                         # Data processing utilities
 │   ├── models/                       # Model implementations
 │   ├── semantic_entropy/             # Semantic Entropy implementation
-│   └── sep/                          # SEP implementation
+│   ├── sep/                          # SEP implementation
+│   └── evaluation/                   # Evaluation and test-set utilities
 │
 ├── notebooks/                         # Research notebooks
 ├── results/                          # Experimental results
@@ -127,6 +145,24 @@ python src/data/split.py
 # Run exploratory analysis
 python src/data/run_eda.py
 ```
+
+### Length-Controlled Evaluation Set
+
+The length-controlled benchmark is generated from the held-out test set. It is a secondary evaluation artifact and must not be used for training, threshold tuning, or hyperparameter selection.
+
+```bash
+python experiments/run_length_controlled_test.py
+```
+
+Generated artifacts:
+
+```text
+data/processed/test_length_controlled.jsonl
+results/length_controlled_test_report.md
+```
+
+The controlled benchmark uses deterministic one-to-one matching with a maximum character-length difference of 1.
+
 
 ---
 
@@ -243,5 +279,5 @@ HalluciDetect: Automated Hallucination Detection in Large Language Models
 
 ---
 
-**Last Updated:** 2026-09-02  
-**Status:** Foundation phase complete, entering model development phase
+**Last Updated:** 2026-10-01  
+**Status:** Data foundation and length-controlled evaluation infrastructure complete; entering detector/model evaluation
