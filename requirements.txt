@@ -1,9 +1,37 @@
-datasets>=2.14.0
-pandas>=2.0.0
-numpy>=1.24.0
+# HalluciDetect - shared environment for all three teammates.
+#
+# Pins below come from the environment where the Llama 3.2 3B 4-bit benchmark
+# ran (env_report from NitroV15: Python 3.11.9, Windows 10, RTX 3050 6GB,
+# CUDA build 12.4). Teammates should match these versions.
+#
+# Python 3.11.x required.
+
+# --- model stack ---
+# Install torch FIRST with the CUDA 12.4 wheel (plain `pip install torch`
+# may give a CPU-only build on Windows):
+#   pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+transformers==5.17.0
+bitsandbytes==0.50.1
+accelerate==1.14.0
+huggingface_hub==1.28.0
+tokenizers==0.23.2
+safetensors==0.8.0
+pytest==9.0.2
+
+# --- data / analysis ---
+numpy==2.4.6
+pandas==3.0.5
+scipy==1.17.1            # used by src/evaluation/length_matching.py
+scikit-learn==1.9.0      # split.py uses train_test_split; keep identical across machines
+datasets==5.0.1
+psutil==7.2.2
+
+# --- not captured by env_report (left as minimums) ---
 matplotlib>=3.7.0
 seaborn>=0.12.0
-scikit-learn>=1.3.0
 jupyter>=1.0.0
 notebook>=7.0.0
-torch>=2.0.0
+
+# --- testing ---
+pytest>=7.0
