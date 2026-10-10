@@ -1,0 +1,24 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-10T05:33:08+00:00",
+  "description": "length-only baseline (chars); direction +1",
+  "detector": "length_only",
+  "extra": {
+    "feature_definition": "len(answer) in characters",
+    "model": {
+      "criterion": "youden",
+      "direction": 1,
+      "feature": "chars",
+      "n_val": 2002,
+      "threshold": 27.5,
+      "val_auroc_raw": 0.9727265741251755
+    }
+  },
+  "n_records": 2000,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "test",
+  "threshold": 27.5,
+  "threshold_source": "validation",
+  "variant": "chars"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "detector": "transformer",
+  "variant": "distilroberta-base_qak",
+  "baseline_config": {
+    "model_name": "distilroberta-base",
+    "include_knowledge": true,
+    "max_length": 320,
+    "batch_size": 16,
+    "eval_batch_size": 64,
+    "lr_grid": [
+      2e-05,
+      5e-05
+    ],
+    "max_epochs": 3,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "seed": 42,
+    "threshold_criterion": "youden",
+    "train_subset": null
+  },
+  "selected": {
+    "lr": 2e-05,
+    "epoch": 3,
+    "val_auroc": 0.9977574872679768
+  },
+  "threshold": {
+    "value": -2.1991437673568726,
+    "criterion": "youden",
+    "selected_on": "validation"
+  },
+  "checkpoint": {
+    "file": "best.pt",
+    "sha256": "e1057c199e6fe20312e0a1ecef2c3d26d3abf897c543e4564c3b930be6dd5881"
+  },
+  "project": {
+    "config_hash": "435a3e4fb7b8",
+    "prompt_version": "v1"
+  },
+  "reselected_after_test": false,
+  "libraries": {
+    "torch": "2.6.0+cu124",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2"
+  },
+  "created_utc": "2026-10-10T13:34:21+00:00",
+  "val_run_path": "C:\\Users\\rajay\\HalluciDetect\\HalluciDetect-Project\\outputs\\detectors\\transformer\\distilroberta-base_qak\\validation.jsonl"
+}
