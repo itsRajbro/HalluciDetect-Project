@@ -73,6 +73,8 @@ def test_config_variant_and_validation():
     c = T.TransformerBaselineConfig()
     assert c.variant() == "distilroberta-base_qak"
     assert T.TransformerBaselineConfig(include_knowledge=False).variant() == "distilroberta-base_qa"
+    assert T.TransformerBaselineConfig(include_question=False).variant() == "distilroberta-base_ak"
+    assert T.TransformerBaselineConfig(include_question=False, include_knowledge=False).variant() == "distilroberta-base_a"
     assert T.TransformerBaselineConfig(model_name="org/My Model", train_subset=400).variant() == "My-Model_qak_smoke"
     assert T.TransformerBaselineConfig.from_dict(json.loads(json.dumps(c.to_dict()))) == c
     with pytest.raises(ValueError):
@@ -84,6 +86,19 @@ def test_build_inputs_formats():
     a, b = T.build_inputs(s, True)
     assert a.startswith("Question: ") and "\nAnswer: " in a and b.startswith("Knowledge: ")
     assert T.build_inputs(s, False)[1] is None
+    # ablations: the answer is always present; removed parts really are absent
+    a, b = T.build_inputs(s, True, include_question=False)
+    assert a == f"Answer: {s.answer.strip()}" and "Question" not in a and b.startswith("Knowledge: ")
+    a, b = T.build_inputs(s, False, include_question=False)
+    assert a == f"Answer: {s.answer.strip()}" and b is None
+
+
+def test_old_frozen_configs_without_include_question_still_load():
+    """The official qak model was frozen before include_question existed."""
+    d = T.TransformerBaselineConfig().to_dict()
+    d.pop("include_question")
+    c = T.TransformerBaselineConfig.from_dict(d)
+    assert c.include_question is True and c.variant() == "distilroberta-base_qak"
 
 
 def test_pick_best_prefers_highest_and_handles_missing():
@@ -145,15 +160,20 @@ def test_tampered_checkpoint_is_rejected(world):
     assert not any(c[0] == "score" for c in backend.calls)
 
 
-def test_changed_project_config_is_rejected(world):
-    backend, _ = freeze(world)
+def test_changed_project_config_warns_but_does_not_invalidate_the_baseline(world):
+    """The baseline uses no Llama/SE/SEP settings, so e.g. Person 2 changing SE sampling must not force a rerun."""
+    backend, frozen = freeze(world)
     base = get_config()
-    other = replace(base, run=replace(base.run, seed=7))
+    other = replace(base, sampled=replace(base.sampled, num_samples=20, temperature=0.7))
     assert other.config_hash() != base.config_hash()
-    with pytest.raises(ValueError, match="config_hash changed"):
-        T.predict_test_and_evaluate(world["out"], project_cfg=other, backend=backend,
-                                    test_samples=world["test"], val_samples=world["val"],
-                                    include_length_controlled=False)
+    with pytest.warns(UserWarning, match="config_hash"):
+        rep = T.predict_test_and_evaluate(world["out"], project_cfg=other, backend=backend,
+                                          test_samples=world["test"], val_samples=world["val"],
+                                          include_length_controlled=False, save=False)
+    assert rep["config_hash"] == base.config_hash()              # keeps the hash it was frozen under
+    assert rep["test"]["metrics"]["auroc"] > 0.9
+    _, meta = read_detector_output(world["runs"] / "test.jsonl")
+    assert meta.config_hash == base.config_hash()                # test run consistent with the validation run
 
 
 def test_smoke_subset_is_applied_and_labelled(world):
