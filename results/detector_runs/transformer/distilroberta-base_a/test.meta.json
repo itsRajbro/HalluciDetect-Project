@@ -1,0 +1,47 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-10T20:47:55+00:00",
+  "description": "transformer baseline distilroberta-base_a: test scores of the frozen model",
+  "detector": "transformer",
+  "extra": {
+    "frozen": {
+      "baseline_config": {
+        "batch_size": 16,
+        "eval_batch_size": 64,
+        "include_knowledge": false,
+        "include_question": false,
+        "lr_grid": [
+          2e-05,
+          5e-05
+        ],
+        "max_epochs": 3,
+        "max_grad_norm": 1.0,
+        "max_length": 320,
+        "model_name": "distilroberta-base",
+        "seed": 42,
+        "threshold_criterion": "youden",
+        "train_subset": null,
+        "warmup_ratio": 0.1,
+        "weight_decay": 0.01
+      },
+      "selected": {
+        "epoch": 3,
+        "lr": 5e-05,
+        "val_auroc": 0.9878298524652172
+      },
+      "threshold": {
+        "criterion": "youden",
+        "selected_on": "validation",
+        "value": -1.8509732484817505
+      }
+    },
+    "uses_llama_prompt": false
+  },
+  "n_records": 2000,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "test",
+  "threshold": -1.8509732484817505,
+  "threshold_source": "validation",
+  "variant": "distilroberta-base_a"
+}

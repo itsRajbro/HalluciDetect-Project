@@ -14,7 +14,8 @@ Protocol (enforced by code, not just convention)
    split. It writes `frozen_config.json` (hyperparameters, threshold, checkpoint
    SHA-256, project config hash) and the validation detector run.
 2. `predict_test_and_evaluate` refuses to run unless the frozen config exists,
-   the checkpoint hash matches it, and the project `config_hash` is unchanged.
+   and the checkpoint hash matches it. (A changed project `config_hash` only triggers a
+   warning: this baseline uses no Llama/SE/SEP setting, so those cannot invalidate it.)
    It scores test ONCE with the frozen model and threshold, writes the test run,
    evaluates with the common evaluator, and drops `test_evaluated.json`.
 3. After that marker exists, `select_and_freeze` refuses to run again unless
@@ -37,6 +38,7 @@ import json
 import re
 import shutil
 import time
+import warnings
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from importlib import metadata
@@ -64,6 +66,7 @@ LOG_FILE = "training_log.json"
 class TransformerBaselineConfig:
     model_name: str = "distilroberta-base"
     include_knowledge: bool = True          # same input information as the Llama detectors (cfg.prompt.include_knowledge)
+    include_question: bool = True           # False = ablation: the model does not see the question
     max_length: int = 320
     batch_size: int = 16
     eval_batch_size: int = 64
@@ -84,7 +87,8 @@ class TransformerBaselineConfig:
 
     def variant(self) -> str:
         short = re.sub(r"[^A-Za-z0-9_.\-]", "-", self.model_name.split("/")[-1])
-        v = f"{short}_{'qak' if self.include_knowledge else 'qa'}"
+        inputs = ("q" if self.include_question else "") + "a" + ("k" if self.include_knowledge else "")
+        v = f"{short}_{inputs}"          # qak (official) | qa | ak | a (answer only)
         return v + "_smoke" if self.train_subset else v
 
     def to_dict(self) -> dict:
@@ -106,9 +110,15 @@ def default_out_dir(project_cfg: Config, cfg: TransformerBaselineConfig) -> Path
 # ---------------------------------------------------------------------------
 # Inputs
 # ---------------------------------------------------------------------------
-def build_inputs(sample: Sample, include_knowledge: bool) -> tuple[str, Optional[str]]:
-    """(segment A, segment B). A = question + candidate answer; B = knowledge (truncated first)."""
-    a = f"Question: {sample.question.strip()}\nAnswer: {sample.answer.strip()}"
+def build_inputs(sample: Sample, include_knowledge: bool, include_question: bool = True) -> tuple[str, Optional[str]]:
+    """(segment A, segment B). A = [question +] candidate answer; B = knowledge (truncated first).
+
+    The answer is always present. `include_question=False` / `include_knowledge=False` give the
+    ablations: answer only, question + answer, answer + knowledge.
+    """
+    a = f"Answer: {sample.answer.strip()}"
+    if include_question:
+        a = f"Question: {sample.question.strip()}\n" + a
     b = f"Knowledge: {sample.knowledge.strip()}" if include_knowledge else None
     return a, b
 
@@ -174,8 +184,15 @@ def assert_selection_allowed(out_dir: Path, force: bool) -> None:
             f"Use force=True / --force only if you accept that and will report it.")
 
 
-def check_frozen(out_dir: Path, project_config_hash: str) -> dict:
-    """Load frozen_config.json and verify it is intact and still valid. Raises on any problem."""
+def check_frozen(out_dir: Path, project_config_hash: Optional[str] = None) -> dict:
+    """Load frozen_config.json and verify it is intact. Raises if it is missing, the checkpoint is
+    missing/changed, or the threshold was not selected on validation.
+
+    The project `config_hash` is deliberately NOT enforced: this baseline never uses the Llama,
+    generation, prompt or SE/SEP settings that the hash covers, so a change there (e.g. Person 2
+    adjusting the SE sampling settings) cannot invalidate the frozen model. A change is reported
+    with a warning, and results keep the hash they were frozen under.
+    """
     out_dir = Path(out_dir)
     fp = out_dir / FROZEN_FILE
     if not fp.is_file():
@@ -186,19 +203,20 @@ def check_frozen(out_dir: Path, project_config_hash: str) -> dict:
         raise FileNotFoundError(f"frozen checkpoint {ckpt} is missing")
     if _sha256(ckpt) != frozen["checkpoint"]["sha256"]:
         raise ValueError("checkpoint does not match the frozen config (file changed after freezing)")
-    if frozen["project"]["config_hash"] != project_config_hash:
-        raise ValueError(
-            f"project config_hash changed since freezing ({frozen['project']['config_hash']} -> "
-            f"{project_config_hash}); re-run select_and_freeze")
     if frozen["threshold"]["selected_on"] != "validation":
         raise ValueError("frozen threshold was not selected on validation")
+    if project_config_hash is not None and frozen["project"]["config_hash"] != project_config_hash:
+        warnings.warn(
+            f"project config_hash is now {project_config_hash} but this baseline was frozen under "
+            f"{frozen['project']['config_hash']}. This baseline does not use the settings the hash covers, "
+            f"so results stay valid and keep the frozen hash.", UserWarning, stacklevel=2)
     return frozen
 
 
-def _records(samples, split, scores, variant, project_cfg, latency_s, peak_gpu_mem_mb):
+def _records(samples, split, scores, variant, config_hash, prompt_version, latency_s, peak_gpu_mem_mb):
     return [DetectorRecord(sample_id=s.sample_id, split=split, detector=DETECTOR, variant=variant,
-                           score=float(sc), config_hash=project_cfg.config_hash(),
-                           prompt_version=project_cfg.prompt.version, latency_s=latency_s,
+                           score=float(sc), config_hash=config_hash,
+                           prompt_version=prompt_version, latency_s=latency_s,
                            n_generations=0, peak_gpu_mem_mb=peak_gpu_mem_mb)
             for s, sc in zip(samples, scores)]
 
@@ -281,7 +299,8 @@ def select_and_freeze(
         "created_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     val_path = write_detector_output(
-        _records(val, "validation", val_scores, variant, project_cfg, None, None),
+        _records(val, "validation", val_scores, variant, project_cfg.config_hash(), project_cfg.prompt.version,
+                 None, None),
         path=path, threshold=thr["value"], cfg=project_cfg,
         description=f"transformer baseline {variant}: validation scores of the frozen model",
         extra={"frozen": {k: frozen[k] for k in ("baseline_config", "selected", "threshold")},
@@ -328,7 +347,8 @@ def predict_test_and_evaluate(
 
     val_path = Path(frozen["val_run_path"])
     test_path = write_detector_output(
-        _records(test, "test", scores, frozen["variant"], project_cfg, sr.latency_s_per_sample, sr.peak_gpu_mem_mb),
+        _records(test, "test", scores, frozen["variant"], frozen["project"]["config_hash"],
+                 frozen["project"]["prompt_version"], sr.latency_s_per_sample, sr.peak_gpu_mem_mb),
         path=val_path.parent / "test.jsonl", threshold=frozen["threshold"]["value"], cfg=project_cfg,
         description=f"transformer baseline {frozen['variant']}: test scores of the frozen model",
         extra={"frozen": {k: frozen[k] for k in ("baseline_config", "selected", "threshold")},
@@ -370,7 +390,7 @@ class TorchBackend:
 
     @staticmethod
     def _encode(tok, samples, cfg: TransformerBaselineConfig) -> list[dict]:
-        pairs = [build_inputs(s, cfg.include_knowledge) for s in samples]
+        pairs = [build_inputs(s, cfg.include_knowledge, cfg.include_question) for s in samples]
         a = [p[0] for p in pairs]
         if cfg.include_knowledge:
             b = [p[1] for p in pairs]

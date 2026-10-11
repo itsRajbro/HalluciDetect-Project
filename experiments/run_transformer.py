@@ -6,7 +6,10 @@
 
 Common options (use the same ones for `select` and `test`):
     --model distilroberta-base     any Hugging Face encoder for sequence classification
-    --no-knowledge                 drop the knowledge passage from the input
+    --no-knowledge                 drop the knowledge passage from the input   (ablation)
+    --no-question                  drop the question from the input            (ablation)
+                                   both flags together = ANSWER-ONLY ablation
+    Variants: qak (official) | qa | ak | a   -> each has its own artifact folder and frozen config
     --lrs 2e-5,5e-5                learning-rate grid
     --epochs 3  --batch-size 16  --max-length 320
 
@@ -30,6 +33,7 @@ from src.detectors.baselines import transformer as T  # noqa: E402
 def _cfg_from_args(args, project_cfg) -> T.TransformerBaselineConfig:
     kw = dict(model_name=args.model,
               include_knowledge=project_cfg.prompt.include_knowledge and not args.no_knowledge,
+              include_question=not args.no_question,
               lr_grid=tuple(float(x) for x in args.lrs.split(",")),
               max_epochs=args.epochs, batch_size=args.batch_size, max_length=args.max_length,
               seed=project_cfg.run.seed)
@@ -43,6 +47,7 @@ def main(argv=None) -> int:
     ap.add_argument("cmd", choices=["smoke", "select", "test"])
     ap.add_argument("--model", default="distilroberta-base")
     ap.add_argument("--no-knowledge", action="store_true")
+    ap.add_argument("--no-question", action="store_true")
     ap.add_argument("--lrs", default="2e-5,5e-5")
     ap.add_argument("--epochs", type=int, default=3)
     ap.add_argument("--batch-size", type=int, default=16)
@@ -84,9 +89,10 @@ def main(argv=None) -> int:
     print("\nlength-stratified (test):")
     for b in report["test"]["length_stratified"]:
         if b["n"]:
-            auc = "n/a" if b["auroc"] is None else f"{b['auroc']:.4f}"
+            auc = "n/a" if b["auroc"] is None else f"{b['auroc']:.4f}" + ("" if b["auroc_reliable"] else "*")
             print(f"  {b['bin']:<16} n={b['n']:>4}  hallucinated={b['frac_hallucinated']:.0%}  "
-                  f"acc={b['accuracy']:.4f}  AUROC={auc}")
+                  f"n_min={b['n_min']:>3}  acc={b['accuracy']:.4f}  AUROC={auc}")
+    print(f"  * AUROC rests on fewer than {E.MIN_CLASS_FOR_AUROC} samples in the smaller class: not interpretable.")
     eff = report.get("efficiency")
     if eff:
         print(f"\nefficiency: {eff['test_mean_runtime_sec_per_sample'] * 1000:.1f} ms/sample inference, "
