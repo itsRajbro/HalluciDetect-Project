@@ -34,3 +34,32 @@ results/tables/*
 # Secrets
 .env
 *.key
+
+#Generated outputs: ignore everything by default
+
+outputs/**
+
+#Allow selected SEP handoff artifacts
+
+!outputs/
+outputs/*
+
+!outputs/detector_models/
+outputs/detector_models/*
+!outputs/detector_models/sep/
+outputs/detector_models/sep/*
+!outputs/detector_models/sep/mean_answer_layer_16/
+outputs/detector_models/sep/mean_answer_layer_16/*
+!outputs/detector_models/sep/mean_answer_layer_16/frozen_config.json
+!outputs/detector_models/sep/mean_answer_layer_16/probe.joblib
+
+!outputs/detectors/
+outputs/detectors/*
+!outputs/detectors/sep/
+outputs/detectors/sep/*
+!outputs/detectors/sep/mean_answer_layer_16/
+outputs/detectors/sep/mean_answer_layer_16/*
+!outputs/detectors/sep/mean_answer_layer_16/test.jsonl
+!outputs/detectors/sep/mean_answer_layer_16/test.meta.json
+!outputs/detectors/sep/mean_answer_layer_16/validation.jsonl
+!outputs/detectors/sep/mean_answer_layer_16/validation.meta.json
