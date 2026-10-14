@@ -1,0 +1,14 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-14T04:27:19+00:00",
+  "description": "",
+  "detector": "sep",
+  "extra": {},
+  "n_records": 2000,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "test",
+  "threshold": 0.9854559515186279,
+  "threshold_source": "validation",
+  "variant": "mean_answer_layer_16"
+}
