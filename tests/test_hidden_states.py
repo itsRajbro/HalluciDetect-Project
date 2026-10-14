@@ -2,7 +2,6 @@
 from types import SimpleNamespace
 
 import pytest
-
 torch = pytest.importorskip("torch")
 
 from src.common import hidden_states as H
