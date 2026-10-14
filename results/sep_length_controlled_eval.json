@@ -1,0 +1,68 @@
+{
+  "detectors": {
+    "sep/mean_answer_layer_16": {
+      "threshold": 0.9854559515186279,
+      "test": {
+        "cluster": "pair",
+        "n_clusters": 1000,
+        "n_boot": 2000,
+        "alpha": 0.05,
+        "seed": 0,
+        "metrics": {
+          "auroc": {
+            "estimate": 0.999554,
+            "lo": 0.99889285,
+            "hi": 0.999951
+          },
+          "accuracy": {
+            "estimate": 0.989,
+            "lo": 0.984,
+            "hi": 0.9930125
+          },
+          "f1": {
+            "estimate": 0.9888888888888889,
+            "lo": 0.9837724076152429,
+            "hi": 0.9929840272009022
+          },
+          "pair_accuracy": {
+            "estimate": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        }
+      },
+      "length_controlled": {
+        "cluster": "match",
+        "n_clusters": 137,
+        "n_boot": 2000,
+        "alpha": 0.05,
+        "seed": 0,
+        "metrics": {
+          "auroc": {
+            "estimate": 0.9947253449837498,
+            "lo": 0.9863578240716074,
+            "hi": 0.9994672065640151
+          },
+          "accuracy": {
+            "estimate": 0.9598540145985401,
+            "lo": 0.9378649635036497,
+            "hi": 0.9817518248175182
+          },
+          "f1": {
+            "estimate": 0.9584905660377359,
+            "lo": 0.93380129112133,
+            "hi": 0.9814126394052045
+          },
+          "match_accuracy": {
+            "estimate": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        }
+      }
+    }
+  },
+  "paired_vs_reference": {},
+  "reference": "sep/mean_answer_layer_16",
+  "n_boot": 2000
+}
