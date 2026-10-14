@@ -1,0 +1,780 @@
+{
+  "detector": "sep/mean_answer_layer_16",
+  "config_hash": "435a3e4fb7b8",
+  "threshold": {
+    "value": 0.9854559515186279,
+    "criterion": "stored_in_run_meta",
+    "selected_on": "validation"
+  },
+  "score_convention": "higher score = more likely hallucinated; pred = score >= threshold",
+  "length_bin_edges_chars": [
+    1.0,
+    12.0,
+    27.0,
+    59.0,
+    260.0
+  ],
+  "validation": {
+    "metrics": {
+      "n": 2002,
+      "n_pos": 1001,
+      "n_neg": 1001,
+      "accuracy": 0.994005994005994,
+      "precision": 1.0,
+      "recall": 0.988011988011988,
+      "f1": 0.9939698492462311,
+      "specificity": 1.0,
+      "confusion_matrix": {
+        "tn": 1001,
+        "fp": 0,
+        "fn": 12,
+        "tp": 989
+      },
+      "auroc": 0.9995738527207059
+    },
+    "pair_level": {
+      "n_pairs": 1001,
+      "pair_accuracy": 0.999000999000999,
+      "n_ties": 0
+    },
+    "length_stratified": [
+      {
+        "bin": "[1, 12)",
+        "n": 486,
+        "n_pos": 14,
+        "n_neg": 472,
+        "frac_hallucinated": 0.02880658436213992,
+        "accuracy": 0.9876543209876543,
+        "recall": 0.5714285714285714,
+        "specificity": 1.0,
+        "auroc": 0.9821428571428571
+      },
+      {
+        "bin": "[12, 27)",
+        "n": 509,
+        "n_pos": 40,
+        "n_neg": 469,
+        "frac_hallucinated": 0.07858546168958742,
+        "accuracy": 0.9921414538310412,
+        "recall": 0.9,
+        "specificity": 1.0,
+        "auroc": 0.9988805970149254
+      },
+      {
+        "bin": "[27, 59)",
+        "n": 504,
+        "n_pos": 449,
+        "n_neg": 55,
+        "frac_hallucinated": 0.8908730158730159,
+        "accuracy": 0.996031746031746,
+        "recall": 0.9955456570155902,
+        "specificity": 1.0,
+        "auroc": 0.999797529864345
+      },
+      {
+        "bin": "[59, 260]",
+        "n": 503,
+        "n_pos": 498,
+        "n_neg": 5,
+        "frac_hallucinated": 0.9900596421471173,
+        "accuracy": 1.0,
+        "recall": 1.0,
+        "specificity": 1.0,
+        "auroc": 1.0
+      }
+    ],
+    "threshold_analysis": [
+      {
+        "threshold": 2.3670151934124317e-16,
+        "accuracy": 0.5,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "specificity": 0.0
+      },
+      {
+        "threshold": 4.327881340431121e-11,
+        "accuracy": 0.5504495504495505,
+        "precision": 0.5265649658074697,
+        "recall": 1.0,
+        "f1": 0.6898690558235699,
+        "specificity": 0.1008991008991009
+      },
+      {
+        "threshold": 6.222321018027731e-10,
+        "accuracy": 0.6003996003996004,
+        "precision": 0.5558023320377568,
+        "recall": 1.0,
+        "f1": 0.7144896502498215,
+        "specificity": 0.2007992007992008
+      },
+      {
+        "threshold": 5.612668384447214e-09,
+        "accuracy": 0.6503496503496503,
+        "precision": 0.588477366255144,
+        "recall": 1.0,
+        "f1": 0.7409326424870466,
+        "specificity": 0.3006993006993007
+      },
+      {
+        "threshold": 2.8714775128015478e-08,
+        "accuracy": 0.7002997002997003,
+        "precision": 0.6252342286071205,
+        "recall": 1.0,
+        "f1": 0.7694081475787855,
+        "specificity": 0.4005994005994006
+      },
+      {
+        "threshold": 1.1932972884368062e-07,
+        "accuracy": 0.7502497502497503,
+        "precision": 0.6668887408394404,
+        "recall": 1.0,
+        "f1": 0.8001598721023182,
+        "specificity": 0.5004995004995005
+      },
+      {
+        "threshold": 4.5097454559786496e-07,
+        "accuracy": 0.8001998001998002,
+        "precision": 0.7144896502498216,
+        "recall": 1.0,
+        "f1": 0.8334721065778519,
+        "specificity": 0.6003996003996004
+      },
+      {
+        "threshold": 1.7545034466664405e-06,
+        "accuracy": 0.8501498501498501,
+        "precision": 0.7694081475787855,
+        "recall": 1.0,
+        "f1": 0.8696785403996524,
+        "specificity": 0.7002997002997003
+      },
+      {
+        "threshold": 1.4836381955822775e-05,
+        "accuracy": 0.9000999000999002,
+        "precision": 0.8334721065778518,
+        "recall": 1.0,
+        "f1": 0.9091734786557674,
+        "specificity": 0.8001998001998002
+      },
+      {
+        "threshold": 0.0001618882569620289,
+        "accuracy": 0.948051948051948,
+        "precision": 0.9073569482288828,
+        "recall": 0.998001998001998,
+        "f1": 0.9505233111322549,
+        "specificity": 0.8981018981018981
+      },
+      {
+        "threshold": 0.5198158900898284,
+        "accuracy": 0.991008991008991,
+        "precision": 0.991008991008991,
+        "recall": 0.991008991008991,
+        "f1": 0.991008991008991,
+        "specificity": 0.991008991008991
+      },
+      {
+        "threshold": 0.9999570358565845,
+        "accuracy": 0.9500499500499501,
+        "precision": 1.0,
+        "recall": 0.9000999000999002,
+        "f1": 0.9474237644584648,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999957802403037,
+        "accuracy": 0.9000999000999002,
+        "precision": 1.0,
+        "recall": 0.8001998001998002,
+        "f1": 0.8890122086570477,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999990589702872,
+        "accuracy": 0.8501498501498501,
+        "precision": 1.0,
+        "recall": 0.7002997002997003,
+        "f1": 0.8237367802585195,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999997753149582,
+        "accuracy": 0.8001998001998002,
+        "precision": 1.0,
+        "recall": 0.6003996003996004,
+        "f1": 0.7503121098626716,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.999999930533425,
+        "accuracy": 0.7502497502497503,
+        "precision": 1.0,
+        "recall": 0.5004995004995005,
+        "f1": 0.6671105193075899,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999803675239,
+        "accuracy": 0.7002997002997003,
+        "precision": 1.0,
+        "recall": 0.4005994005994006,
+        "f1": 0.5720399429386591,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999967175526,
+        "accuracy": 0.6503496503496503,
+        "precision": 1.0,
+        "recall": 0.3006993006993007,
+        "f1": 0.46236559139784944,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999994976455,
+        "accuracy": 0.6003996003996004,
+        "precision": 1.0,
+        "recall": 0.2007992007992008,
+        "f1": 0.3344425956738769,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999999649197,
+        "accuracy": 0.5504495504495505,
+        "precision": 1.0,
+        "recall": 0.1008991008991009,
+        "f1": 0.18330308529945552,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 1.0,
+        "accuracy": 0.502997002997003,
+        "precision": 1.0,
+        "recall": 0.005994005994005994,
+        "f1": 0.011916583912611719,
+        "specificity": 1.0
+      }
+    ],
+    "errors": {
+      "length_by_outcome": {
+        "TP": {
+          "n": 989,
+          "mean_len_chars": 66.05662285136502,
+          "median_len_chars": 59.0
+        },
+        "TN": {
+          "n": 1001,
+          "mean_len_chars": 13.242757242757243,
+          "median_len_chars": 12.0
+        },
+        "FP": null,
+        "FN": {
+          "n": 12,
+          "mean_len_chars": 15.75,
+          "median_len_chars": 14.0
+        }
+      },
+      "top_false_positives": [],
+      "top_false_negatives": [
+        {
+          "sample_id": "S008632_1",
+          "pair_id": "P04491",
+          "score": 4.733663109166104e-05,
+          "answer_length_chars": 7,
+          "question": "Helen Herz Cohen (1912 \u2013 March 23, 2006) was the Director of Camp Walden, an all-girls residential summer camp located in Denmark, a town in Oxford County, Maine, in which country?",
+          "answer": "Denmark"
+        },
+        {
+          "sample_id": "S008016_1",
+          "pair_id": "P06242",
+          "score": 0.00010070597937901805,
+          "answer_length_chars": 5,
+          "question": "What is the middle name of Beate Clausdatter Bille's Son ?",
+          "answer": "Brahe"
+        },
+        {
+          "sample_id": "S008944_1",
+          "pair_id": "P09038",
+          "score": 0.0016566527255050196,
+          "answer_length_chars": 3,
+          "question": "When a former broadcaster with ABC Sports returned to coaching, how many years was the team he started coaching with the National Football League?",
+          "answer": "2nd"
+        },
+        {
+          "sample_id": "S008992_1",
+          "pair_id": "P08296",
+          "score": 0.0026636221054435628,
+          "answer_length_chars": 26,
+          "question": "One of the musicals John Cullum won Best Leading Actor in a Musical for was a screwball comedy. What was the name of the other?",
+          "answer": "\"On the Twentieth Century\""
+        },
+        {
+          "sample_id": "S008015_1",
+          "pair_id": "P05486",
+          "score": 0.07564736108740003,
+          "answer_length_chars": 5,
+          "question": "The Fortune Cookie (alternative UK title: Meet Whiplash Willie) is a 1966 black It was produced and directed by Samuel \"Billy\" Wilder, an Austrian-American filmmaker, screenwriter, producer, artist, a",
+          "answer": "seven"
+        },
+        {
+          "sample_id": "S008073_1",
+          "pair_id": "P09748",
+          "score": 0.1473594406032564,
+          "answer_length_chars": 35,
+          "question": "Ebony and Hatiora in what genuses",
+          "answer": "genus \"Diospyros\" and \"Apocynaceae\""
+        },
+        {
+          "sample_id": "S008779_1",
+          "pair_id": "P09505",
+          "score": 0.15411445439197302,
+          "answer_length_chars": 4,
+          "question": "Bret Schundler served in the cabinet of a New Jersey governor whose term ended in what year?",
+          "answer": "2012"
+        },
+        {
+          "sample_id": "S008663_1",
+          "pair_id": "P04727",
+          "score": 0.34862807423023634,
+          "answer_length_chars": 18,
+          "question": "Which singer, born in 1977, shared the stage with an American bluegrass singer, songwriter, and multi-instrumentalist known as the \"the new Queen of Bluegrass\"?",
+          "answer": "Rhonda Lea Vincent"
+        },
+        {
+          "sample_id": "S008497_1",
+          "pair_id": "P00937",
+          "score": 0.5178948544246087,
+          "answer_length_chars": 18,
+          "question": "Mfon Sunday Udoka, is a Nigerian American former professional basketball player and the new Assistant Coach of the Nigeria women's national basketball team the Lady Tigers, she's the sister of NBA pla",
+          "answer": "San Antonio Spurs."
+        },
+        {
+          "sample_id": "S008649_1",
+          "pair_id": "P02658",
+          "score": 0.5217369257550482,
+          "answer_length_chars": 11,
+          "question": "What was the middle name of the pianist who first performed Prokofiev's Piano Sonata No. 8?",
+          "answer": "Sergeyevich"
+        }
+      ]
+    },
+    "metrics_native_pred_label": {
+      "n": 2002,
+      "n_pos": 1001,
+      "n_neg": 1001,
+      "accuracy": 0.994005994005994,
+      "precision": 1.0,
+      "recall": 0.988011988011988,
+      "f1": 0.9939698492462311,
+      "specificity": 1.0,
+      "confusion_matrix": {
+        "tn": 1001,
+        "fp": 0,
+        "fn": 12,
+        "tp": 989
+      },
+      "auroc": 0.9995738527207059
+    }
+  },
+  "test": {
+    "metrics": {
+      "n": 2000,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "accuracy": 0.989,
+      "precision": 0.9989795918367347,
+      "recall": 0.979,
+      "f1": 0.9888888888888889,
+      "specificity": 0.999,
+      "confusion_matrix": {
+        "tn": 999,
+        "fp": 1,
+        "fn": 21,
+        "tp": 979
+      },
+      "auroc": 0.999554
+    },
+    "pair_level": {
+      "n_pairs": 1000,
+      "pair_accuracy": 1.0,
+      "n_ties": 0
+    },
+    "length_stratified": [
+      {
+        "bin": "[1, 12)",
+        "n": 442,
+        "n_pos": 17,
+        "n_neg": 425,
+        "frac_hallucinated": 0.038461538461538464,
+        "accuracy": 0.997737556561086,
+        "recall": 0.9411764705882353,
+        "specificity": 1.0,
+        "auroc": 0.9995847750865052
+      },
+      {
+        "bin": "[12, 27)",
+        "n": 545,
+        "n_pos": 42,
+        "n_neg": 503,
+        "frac_hallucinated": 0.07706422018348624,
+        "accuracy": 0.9908256880733946,
+        "recall": 0.8809523809523809,
+        "specificity": 1.0,
+        "auroc": 0.9920477137176938
+      },
+      {
+        "bin": "[27, 59)",
+        "n": 536,
+        "n_pos": 472,
+        "n_neg": 64,
+        "frac_hallucinated": 0.8805970149253731,
+        "accuracy": 0.9757462686567164,
+        "recall": 0.972457627118644,
+        "specificity": 1.0,
+        "auroc": 0.9997682733050848
+      },
+      {
+        "bin": "[59, 260]",
+        "n": 477,
+        "n_pos": 469,
+        "n_neg": 8,
+        "frac_hallucinated": 0.9832285115303984,
+        "accuracy": 0.9937106918238994,
+        "recall": 0.9957356076759062,
+        "specificity": 0.875,
+        "auroc": 0.9914712153518124
+      }
+    ],
+    "threshold_analysis": [
+      {
+        "threshold": 8.82122434661921e-17,
+        "accuracy": 0.5,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "specificity": 0.0
+      },
+      {
+        "threshold": 8.590728464954389e-11,
+        "accuracy": 0.55,
+        "precision": 0.5263157894736842,
+        "recall": 1.0,
+        "f1": 0.6896551724137931,
+        "specificity": 0.1
+      },
+      {
+        "threshold": 1.6808858315820228e-09,
+        "accuracy": 0.6,
+        "precision": 0.5555555555555556,
+        "recall": 1.0,
+        "f1": 0.7142857142857143,
+        "specificity": 0.2
+      },
+      {
+        "threshold": 1.260756734305131e-08,
+        "accuracy": 0.65,
+        "precision": 0.5882352941176471,
+        "recall": 1.0,
+        "f1": 0.7407407407407407,
+        "specificity": 0.3
+      },
+      {
+        "threshold": 4.98415165169703e-08,
+        "accuracy": 0.7,
+        "precision": 0.625,
+        "recall": 1.0,
+        "f1": 0.7692307692307693,
+        "specificity": 0.4
+      },
+      {
+        "threshold": 1.4402043679141762e-07,
+        "accuracy": 0.75,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "specificity": 0.5
+      },
+      {
+        "threshold": 6.204123645739329e-07,
+        "accuracy": 0.8,
+        "precision": 0.7142857142857143,
+        "recall": 1.0,
+        "f1": 0.8333333333333333,
+        "specificity": 0.6
+      },
+      {
+        "threshold": 2.715198586401751e-06,
+        "accuracy": 0.85,
+        "precision": 0.7692307692307693,
+        "recall": 1.0,
+        "f1": 0.8695652173913044,
+        "specificity": 0.7
+      },
+      {
+        "threshold": 1.5541415674591843e-05,
+        "accuracy": 0.899,
+        "precision": 0.8325,
+        "recall": 0.999,
+        "f1": 0.9081818181818181,
+        "specificity": 0.799
+      },
+      {
+        "threshold": 0.0001572804309595718,
+        "accuracy": 0.949,
+        "precision": 0.9081818181818182,
+        "recall": 0.999,
+        "f1": 0.9514285714285713,
+        "specificity": 0.899
+      },
+      {
+        "threshold": 0.2551051832179161,
+        "accuracy": 0.995,
+        "precision": 0.995,
+        "recall": 0.995,
+        "f1": 0.995,
+        "specificity": 0.995
+      },
+      {
+        "threshold": 0.9999410734146067,
+        "accuracy": 0.95,
+        "precision": 1.0,
+        "recall": 0.9,
+        "f1": 0.9473684210526316,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999928398415513,
+        "accuracy": 0.9,
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.888888888888889,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999987394349896,
+        "accuracy": 0.85,
+        "precision": 1.0,
+        "recall": 0.7,
+        "f1": 0.8235294117647058,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999997102879841,
+        "accuracy": 0.8,
+        "precision": 1.0,
+        "recall": 0.6,
+        "f1": 0.7499999999999999,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999253142104,
+        "accuracy": 0.75,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999786488802,
+        "accuracy": 0.7,
+        "precision": 1.0,
+        "recall": 0.4,
+        "f1": 0.5714285714285715,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999951270476,
+        "accuracy": 0.65,
+        "precision": 1.0,
+        "recall": 0.3,
+        "f1": 0.4615384615384615,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.999999998980295,
+        "accuracy": 0.6,
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1": 0.33333333333333337,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999999382669,
+        "accuracy": 0.55,
+        "precision": 1.0,
+        "recall": 0.1,
+        "f1": 0.18181818181818182,
+        "specificity": 1.0
+      },
+      {
+        "threshold": 0.9999999999999998,
+        "accuracy": 0.5005,
+        "precision": 1.0,
+        "recall": 0.001,
+        "f1": 0.0019980019980019984,
+        "specificity": 1.0
+      }
+    ],
+    "errors": {
+      "length_by_outcome": {
+        "TP": {
+          "n": 979,
+          "mean_len_chars": 65.27170582226762,
+          "median_len_chars": 57.0
+        },
+        "TN": {
+          "n": 999,
+          "mean_len_chars": 13.73973973973974,
+          "median_len_chars": 13.0
+        },
+        "FP": {
+          "n": 1,
+          "mean_len_chars": 76.0,
+          "median_len_chars": 76.0
+        },
+        "FN": {
+          "n": 21,
+          "mean_len_chars": 53.333333333333336,
+          "median_len_chars": 32.0
+        }
+      },
+      "top_false_positives": [
+        {
+          "sample_id": "S009738_0",
+          "pair_id": "P03687",
+          "score": 0.9999024775783599,
+          "answer_length_chars": 76,
+          "question": "What song by an American hard rock band is referenced in the song \"On the Radio\" by Regina Spektor?",
+          "answer": "The chorus contains references to the song \"November Rain\" by Guns N' Roses."
+        }
+      ],
+      "top_false_negatives": [
+        {
+          "sample_id": "S009184_1",
+          "pair_id": "P05441",
+          "score": 3.401769164908678e-06,
+          "answer_length_chars": 15,
+          "question": "Clunk Click Every Trip starred the DJ and fundraiser who hosted what BBC television show?",
+          "answer": "Top of the Pops"
+        },
+        {
+          "sample_id": "S009239_1",
+          "pair_id": "P08820",
+          "score": 0.0051366520680264085,
+          "answer_length_chars": 38,
+          "question": "Kellie Pickler is the self-titled second studio album by the American country artist, Since the albums' release, three more singles have charted; including which song, written and performed by America",
+          "answer": "\"Didn't You Know How Much I Loved You\""
+        },
+        {
+          "sample_id": "S009386_1",
+          "pair_id": "P08795",
+          "score": 0.015286744649850102,
+          "answer_length_chars": 30,
+          "question": "What was the final studio album of Prince that Tony M. and his band reunited as a backing band for?",
+          "answer": "\"Hit n Run Phase Two Part Two\""
+        },
+        {
+          "sample_id": "S009228_1",
+          "pair_id": "P03435",
+          "score": 0.02520359128435183,
+          "answer_length_chars": 7,
+          "question": "What animal do both Cocky and cockfights have in common?",
+          "answer": "chicken"
+        },
+        {
+          "sample_id": "S009690_1",
+          "pair_id": "P08502",
+          "score": 0.03489601454481062,
+          "answer_length_chars": 28,
+          "question": "What research group was formed in 2014 due to Russia's suspension?",
+          "answer": "The G7 Summit Research Group"
+        },
+        {
+          "sample_id": "S009957_1",
+          "pair_id": "P06409",
+          "score": 0.2719768136009864,
+          "answer_length_chars": 31,
+          "question": "Emet is a small unincorporated community where what Oklahoma Hall of Fame inductee was born?",
+          "answer": "Native American actress Te Ata."
+        },
+        {
+          "sample_id": "S009639_1",
+          "pair_id": "P01733",
+          "score": 0.32829763399839024,
+          "answer_length_chars": 35,
+          "question": "Radical Axis (also known as \"radicalaxis\" or \"Radical Axis, Inc.\") is an animation studio headquartered in Atlanta, Georgia, United States known for its diverse work in both episodic television and co",
+          "answer": "Squidbillies is on Cartoon Network."
+        },
+        {
+          "sample_id": "S009485_1",
+          "pair_id": "P06978",
+          "score": 0.3671603514277967,
+          "answer_length_chars": 18,
+          "question": "What postmaster was the indirect namesake of Urge Overkill's second EP?",
+          "answer": "Sylvester Stallone"
+        },
+        {
+          "sample_id": "S009347_1",
+          "pair_id": "P08110",
+          "score": 0.6938096538801992,
+          "answer_length_chars": 54,
+          "question": "What case did Thurgood Marshall argue which established the unconstitutionality of separate schools for black and white students?",
+          "answer": "Thurgood Marshall argued \"Brown v. Board of Education\""
+        },
+        {
+          "sample_id": "S009383_1",
+          "pair_id": "P03313",
+          "score": 0.788322269612778,
+          "answer_length_chars": 313,
+          "question": "The Battle of Gully Hole Creek was a battle that took place on July 18, 1742 (new style) between Spanish and British forces in the Province of Georgia,was one of the Southern colonies in British Ameri",
+          "answer": "The Battle of Gully Hole Creek was a battle that took place on July 18, 1742 (new style) between Spanish and British forces in the Province of Georgia, resulting in a victory for the British. It was t"
+        }
+      ]
+    },
+    "metrics_native_pred_label": {
+      "n": 2000,
+      "n_pos": 1000,
+      "n_neg": 1000,
+      "accuracy": 0.989,
+      "precision": 0.9989795918367347,
+      "recall": 0.979,
+      "f1": 0.9888888888888889,
+      "specificity": 0.999,
+      "confusion_matrix": {
+        "tn": 999,
+        "fp": 1,
+        "fn": 21,
+        "tp": 979
+      },
+      "auroc": 0.999554
+    }
+  },
+  "length_controlled": {
+    "metrics": {
+      "n": 274,
+      "n_pos": 137,
+      "n_neg": 137,
+      "accuracy": 0.9598540145985401,
+      "precision": 0.9921875,
+      "recall": 0.927007299270073,
+      "f1": 0.9584905660377359,
+      "specificity": 0.9927007299270073,
+      "confusion_matrix": {
+        "tn": 136,
+        "fp": 1,
+        "fn": 10,
+        "tp": 127
+      },
+      "auroc": 0.9947253449837498
+    },
+    "match_level": {
+      "n_matches": 137,
+      "match_accuracy": 1.0,
+      "n_ties": 0
+    }
+  },
+  "efficiency": {
+    "test_total_runtime_sec": 0.05491900000000045,
+    "test_mean_runtime_sec_per_sample": 2.7459500000000224e-05
+  },
+  "warnings": [],
+  "prompt_version": "v1"
+}
