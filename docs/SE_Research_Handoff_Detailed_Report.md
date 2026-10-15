@@ -3,70 +3,80 @@
 **Project:** HalluciDetect-Project\
 **Workstream:** Person 2 --- Semantic Entropy (SE)\
 **Branch:** `person2/semantic-entropy`\
-**Status date:** 14 October 2026\
-**Latest known commit:** `ff4ffa0` --- Add resumable controlled-test
-semantic entropy runner
+**Status date:** 15 October 2026\
+**Latest previously reported commit:** `ff4ffa0` --- Add resumable
+controlled-test semantic entropy runner\
+**Current experiment tags:** `validation_full_v1`, `lc_full_v1`
 
-> **Purpose:** Document the SE implementation, data contract, experiment
-> status, evaluation protocol, reproducible commands, risks, and
-> remaining work.
->
-> **Important distinction:** This is for **Semantic Entropy (SE)**, not
-> the separate **Semantic Entropy Probes (SEP)** workstream. SEP uses
-> hidden-state features and a supervised probe; this SE workstream uses
-> sampled generations, semantic clusters, entropy, and candidate-aware
-> scoring.
->
-> Full-scale performance results are pending. The two-sample controlled
-> smoke run is an integration check only, not final performance
-> evidence.
+> **Scope:** This report covers Semantic Entropy (SE), not Semantic
+> Entropy Probes (SEP). SE uses sampled generations, semantic clusters,
+> entropy, and candidate-aware scoring; SEP uses hidden-state features
+> and a supervised probe.
 
 ## Executive summary
 
-The Person 2 SE workstream includes shared
-generation/data/schema/evaluator interfaces, semantic clustering,
-Shannon entropy over cluster probabilities, candidate-aware scoring,
-NLI-based semantic equivalence, a resumable pair-aware validation
-runner, and a resumable length-controlled test runner.
+The SE workstream includes shared generation/data/schema/evaluator
+interfaces, semantic clustering, Shannon entropy over cluster
+probabilities, candidate-aware scoring, NLI-based semantic equivalence,
+a resumable pair-aware validation runner, and a resumable
+length-controlled test runner.
 
-The reported full test suite passes **148 tests**. Commit `ff4ffa0` was
-pushed to `origin/person2/semantic-entropy`.
+The latest recorded regression test run passed **148 tests in 30.76
+seconds**.
 
-Full-scale experiments remain incomplete. The validation run was
-previously interrupted after 26 pairs out of 1,001. The
-length-controlled test set contains 274 samples, of which two were
-processed in the `lc_v1` smoke run.
+Full validation and length-controlled test runs have completed: -
+Validation: 1,001 pairs, or 2,002 records per detector. -
+Length-controlled test: 274 examples, comprising 137 matched pairs and
+137 examples per label. - Validation-only thresholds were selected and
+saved separately. - Controlled-test evaluation was performed using those
+frozen thresholds.
+
+**Important scope limitation:** the results below cover the 274-example
+length-controlled subset, not the full 2,000-example test split. Do not
+present these as full-test performance.
 
 ## Current status
 
-  ----------------------------------------------------------------------------
-  Area                    Status                  Evidence / note
-  ----------------------- ----------------------- ----------------------------
-  Implementation          Implemented             Shared pipeline, entropy,
-                                                  clustering, candidate-aware
-                                                  scoring, NLI equivalence,
-                                                  and runners exist.
+  -----------------------------------------------------------------------
+  Area                    Status                  Evidence
+  ----------------------- ----------------------- -----------------------
+  Implementation          Implemented             Shared pipeline,
+                                                  entropy, clustering,
+                                                  candidate-aware
+                                                  scoring, NLI
+                                                  equivalence, and
+                                                  runners
 
-  Automated tests         148 passed              Last reported command:
-                                                  `python -m pytest -q`.
+  Automated tests         Passed                  `python -m pytest -q`
+                                                  --- 148 passed in
+                                                  30.76s
 
-  Git                     Pushed                  Commit `ff4ffa0`; branch
-                                                  `person2/semantic-entropy`
-                                                  aligned with origin at last
-                                                  check.
+  Validation run          Completed               1,001 pairs; 2,002
+                                                  records per detector
 
-  Validation              Pending                 Previously checkpointed 26
-                                                  pairs; target 1,001
-                                                  validation pairs.
+  Validation thresholds   Selected and frozen     Threshold files record
+                                                  validation-only
+                                                  provenance
 
-  Controlled test         Pending                 274 samples total; `lc_v1`
-                                                  smoke outputs contain 2
-                                                  samples.
+  Length-controlled run   Completed               274 records per
+                                                  detector; 137 matched
+                                                  pairs
 
-  Final metrics           Pending                 Wait for full coverage and
-                                                  validation-only threshold
-                                                  selection.
-  ----------------------------------------------------------------------------
+  Controlled-test         Completed               Evaluation JSON files
+  evaluation                                      saved for both
+                                                  detectors
+
+  Full 2,000-example test Not completed           Only the
+  evaluation                                      length-controlled
+                                                  subset has been
+                                                  evaluated
+
+  Git publication         Pending review          Working tree contains
+                                                  modified tests and
+                                                  untracked local
+                                                  artifacts; stage
+                                                  selectively
+  -----------------------------------------------------------------------
 
 ## 1. Workstream definition and terminology
 
@@ -74,8 +84,8 @@ Semantic entropy measures uncertainty over semantic answer clusters
 rather than raw token-level variation. The pipeline samples multiple
 answers for an input, groups semantically equivalent answers, and
 computes entropy over cluster probabilities. Candidate-aware scoring
-separately measures how represented a supplied candidate is among
-generated answers.
+measures how represented a supplied candidate is among generated
+answers.
 
 > **Interpretation caution:** Low global semantic entropy is not proof
 > that an answer is factual. A model can be confidently wrong.
@@ -92,206 +102,197 @@ pairs expanded into 20,000 candidate examples. Pair-level split:
 -   Validation: 1,001 pairs
 -   Test: 1,000 pairs
 
-Label convention: **1 = hallucinated**, **0 = factual**. Higher detector
-score should mean more likely hallucinated.
+Label convention: **1 = hallucinated**, **0 = factual**. The shared
+contract specifies that higher detector scores should indicate a greater
+likelihood of hallucination.
 
-The length-controlled test set has **274 examples**, arranged as **137
-matched pairs**, with 137 examples per label. Answer lengths within each
-matched pair differ by at most one character. Some matched pairs may use
-different original questions, so interpret matched-pair accuracy
-carefully.
+The length-controlled test set contains **274 examples**, arranged as
+**137 matched pairs**, with 137 examples per label. Answer lengths
+within each matched pair differ by at most one character. Some matched
+pairs may use different original questions, so matched-pair accuracy
+requires cautious interpretation.
 
 Preserve sample IDs, pair IDs, match IDs, split labels, config hash,
 prompt version, label semantics, and output metadata. Do not select or
 tune thresholds using test labels.
 
-## 3. Implementation file map
+## 3. Implementation and experiment artifacts
 
-  ------------------------------------------------------------------------------------------------------------------
-  Component                                                    Role                    Current understanding
-  ------------------------------------------------------------ ----------------------- -----------------------------
-  `src/common/generation.py`                                   Shared generation       Generation outputs and
-                                                                                       statistics; sample-level
-                                                                                       seeding supports
-                                                                                       reproducibility.
+Relevant implementation files include:
 
-  `src/common/data.py`                                         Data loading            Split loading, pair grouping,
-                                                                                       controlled-test loading, and
-                                                                                       match grouping.
+-   `src/common/generation.py` --- generation outputs and statistics.
+-   `src/common/data.py` --- split loading, pair grouping,
+    controlled-test loading, and match grouping.
+-   `src/common/schema.py` --- detector records, JSONL/metadata
+    read/write, efficiency and coverage helpers.
+-   `src/common/evaluator.py` --- score alignment, AUROC, classification
+    metrics, threshold selection, pair/match metrics, length strata, and
+    run evaluation.
+-   `src/detectors/semantic_entropy/entropy.py` --- Shannon entropy over
+    cluster probabilities.
+-   `src/detectors/semantic_entropy/clustering.py` --- exact baseline
+    clustering with optional equivalence predicate.
+-   `src/detectors/semantic_entropy/candidate_aware.py` ---
+    candidate-cluster probability and score `1 - probability`.
+-   `src/detectors/semantic_entropy/nli_equivalence.py` --- reported NLI
+    model `facebook/bart-large-mnli`, bidirectional entailment threshold
+    0.85, and short-answer fallback.
+-   `src/detectors/semantic_entropy/runner_pair_checkpoint.py` ---
+    resumable pair-aware validation runner.
+-   `src/detectors/semantic_entropy/runner_controlled_test.py` ---
+    resumable length-controlled test runner.
 
-  `src/common/schema.py`                                       Output schema           Detector records,
-                                                                                       JSONL/metadata read/write,
-                                                                                       efficiency and coverage
-                                                                                       helpers.
+Recorded experiment configuration: - Config hash: `435a3e4fb7b8` -
+Prompt version: `v1` - Model: Llama 3.2 3B Instruct NF4 - Dataset:
+HaluEval QA
 
-  `src/common/evaluator.py`                                    Evaluation              Score alignment, AUROC,
-                                                                                       classification metrics,
-                                                                                       threshold selection,
-                                                                                       pair/match metrics, length
-                                                                                       strata, run evaluation.
+### Validation outputs
 
-  `src/detectors/semantic_entropy/entropy.py`                  Entropy                 Shannon entropy over cluster
-                                                                                       probabilities in nats and
-                                                                                       normalized entropy.
+-   `outputs/detectors/se_global/nli/validation_validation_full_v1.jsonl`
+-   `outputs/detectors/se_candidate/nli/validation_validation_full_v1.jsonl`
+-   Checkpoint:
+    `outputs/detectors/_checkpoints/se_pair_validation_full_v1.jsonl`
 
-  `src/detectors/semantic_entropy/clustering.py`               Clustering              Whitespace/case exact
-                                                                                       baseline plus optional
-                                                                                       equivalence predicate.
+Recorded validation metadata checks: - 2,002 records per detector -
+Split: `validation` - Detectors: `se_global` and `se_candidate` -
+Variant: `nli` - Config hash: `435a3e4fb7b8` - Prompt version: `v1` -
+Output metadata threshold: `None` (thresholds saved separately)
 
-  `src/detectors/semantic_entropy/candidate_aware.py`          Candidate score         Candidate-cluster probability
-                                                                                       and score `1 - probability`;
-                                                                                       not a factuality guarantee.
+### Length-controlled test outputs
 
-  `src/detectors/semantic_entropy/nli_equivalence.py`          NLI equivalence         Reported model
-                                                                                       `facebook/bart-large-mnli`,
-                                                                                       bidirectional entailment
-                                                                                       threshold 0.85, short-answer
-                                                                                       fallback.
+-   `outputs/detectors/se_global/nli/test_length_controlled_lc_full_v1.jsonl`
+-   `outputs/detectors/se_candidate/nli/test_length_controlled_lc_full_v1.jsonl`
+-   Evaluation:
+    `outputs/evaluation/se_global_length_controlled_lc_full_v1.json`
+-   Evaluation:
+    `outputs/evaluation/se_candidate_length_controlled_lc_full_v1.json`
 
-  `runner_pair_checkpoint.py`                                  Validation runner       Pair-aware resumable
-                                                                                       validation; last known
-                                                                                       checkpoint had 26 completed
-                                                                                       pairs.
+Recorded controlled-test metadata checks: - 274 records per detector -
+Split: `test` - Detectors: `se_global` and `se_candidate` - Variant:
+`nli` - Config hash: `435a3e4fb7b8` - Prompt version: `v1` - Output
+metadata threshold: `None`; the evaluator used the separately saved
+validation threshold.
 
-  `src/detectors/semantic_entropy/runner_controlled_test.py`   Controlled runner       Resumable per-sample
-                                                                                       checkpoints, unique tags,
-                                                                                       metadata checks, overwrite
-                                                                                       protection.
-  ------------------------------------------------------------------------------------------------------------------
+## 4. Validation-only threshold selection
 
-## 4. Controlled-test smoke run
+Threshold selection used validation records only and the Youden
+criterion. These thresholds were then frozen before controlled-test
+evaluation.
 
-The `lc_v1` smoke run wrote global-SE and candidate-aware outputs with
-two records each. Recorded IDs: `S009005_0` and `S009305_1`. Both
-outputs used `split=test`, config hash `435a3e4fb7b8`, prompt version
-`v1`, finite scores, and no selected threshold. The two checkpoints
-contained the same IDs. The evaluator smoke check reported one matched
-pair and match accuracy 1.0 for each detector.
+  Detector                   Frozen threshold    Validation Youden J Threshold source
+  -------------------- ---------------------- ---------------------- ------------------
+  Global SE              `0.1625414866957241`                  `0.0` Validation only
+  Candidate-aware SE                   `0.95`   `0.6313686313686313` Validation only
 
-> **Do not interpret this as performance:** one matched pair is only a
-> pipeline integration test. Existing `lc_v1` final outputs exist, and
-> the runner protects against overwriting them. Inspect CLI help and use
-> a fresh tag for a full run if required.
+Threshold files: -
+`outputs/detectors/se_global/nli/threshold_validation_full_v1.json` -
+`outputs/detectors/se_candidate/nli/threshold_validation_full_v1.json`
 
-## 5. Remaining work in order
+The global SE threshold has a validation Youden J of zero. This warrants
+investigation of score distributions, score direction, and validation
+behavior, without tuning against test labels.
 
-### A. Resume full validation
+## 5. Length-controlled test results
 
-Inspect
-`outputs/detectors/_checkpoints/se_pair_validation_full_v1.jsonl`,
-validate unique pair IDs and metadata, and resume the pair-aware runner
-until all 1,001 validation pairs are covered. Do not restart from
-scratch if checkpoint validation allows resume.
+Evaluation subset: **274 examples** (137 positive, 137 negative), with
+137 matched pairs. Higher scores are intended to indicate hallucination.
 
-### B. Verify validation output
+  Metric                             Global SE   Candidate-aware SE
+  ----------------------- -------------------- --------------------
+  Threshold                 0.1625414866957241                 0.95
+  Accuracy                              45.26%               74.82%
+  Precision                             47.21%               67.89%
+  Recall                                80.29%               94.16%
+  F1                                    59.46%               78.90%
+  Specificity                           10.22%               55.47%
+  AUROC                                 0.4450               0.7472
+  Matched-pair accuracy                 43.43%               74.09%
+  Matched pairs                            137                  137
+  Matched-pair ties                          1                   57
 
-Check expected pair/sample coverage, duplicates, missing IDs, label
-distribution, finite scores, config hash, prompt version, split, both
-detector variants, and generation statistics.
+### Confusion matrices
 
-### C. Freeze threshold on validation
+Rows are actual labels; columns are predicted labels.
 
-Use validation records only for threshold selection. Save threshold and
-provenance in metadata. Test labels must not influence threshold choice.
+**Global SE**
 
-### D. Complete controlled test
+                              Predicted factual (0)   Predicted hallucinated (1)
+  ------------------------- ----------------------- ----------------------------
+  Actual factual (0)                        TN = 14                     FP = 123
+  Actual hallucinated (1)                   FN = 27                     TP = 110
 
-Inspect `lc_v1` checkpoint/output state. Verify global and candidate
-checkpoint IDs match. Use a fresh tag if needed and process all 274
-samples, expecting 137 matched pairs and 137 examples per label.
+**Candidate-aware SE**
 
-### E. Verify final outputs
+                              Predicted factual (0)   Predicted hallucinated (1)
+  ------------------------- ----------------------- ----------------------------
+  Actual factual (0)                        TN = 76                      FP = 61
+  Actual hallucinated (1)                    FN = 8                     TP = 129
 
-Enforce exact sample coverage, unique IDs, `split=test`, config hash,
-prompt version, finite scores, label semantics, and metadata
-consistency. Stop if coverage differs; never silently discard mismatched
-IDs.
+### Interpretation
 
-### F. Run final evaluation
+-   Candidate-aware SE outperformed global SE on this length-controlled
+    subset: accuracy was about **29.56 percentage points higher**, and
+    AUROC was about **0.3022 higher**.
+-   Candidate-aware SE had high recall (94.16%) but still produced 61
+    false positives.
+-   Candidate-aware matched-pair accuracy was 74.09%, with 57 ties among
+    137 pairs.
+-   Global SE had AUROC below 0.5 and very low specificity at its frozen
+    validation threshold. Investigate score direction and validation
+    behavior; do not reverse scores or choose a new threshold based on
+    these test results without a separately specified, validation-only
+    procedure.
+-   Matched pairs control answer length within a pair, not all
+    confounders; some pairs may contain different original questions.
 
-Use the frozen validation threshold. Report AUROC, classification
-metrics, matched-pair accuracy, ties, length-stratified metrics,
-efficiency, and counts for both detectors.
-
-### G. Package and hand off
-
-Document run settings, model/generation config, seeds,
-software/hardware, limitations, and output locations. Review local Git
-changes and stage only intended files; do not use `git add .`.
+**These are controlled-subset results only.** They do not establish
+performance on the full test split.
 
 ## 6. Reproducible commands
 
-Run from the repository root with `.venv` activated. The committed
-`pytest.ini` configures `testpaths = tests` and
-`addopts = --import-mode=importlib`.
+Run commands from the repository root with `.venv` activated. In a new
+PowerShell terminal:
 
-### 6.1 Verify checkout and tests
+``` powershell
+.\.venv\Scripts\Activate.ps1
+$env:PYTHONPATH = (Get-Location).Path
+```
+
+Run regression tests:
+
+``` powershell
+python -m pytest -q
+```
+
+Expected latest recorded result: `148 passed in 30.76s`.
+
+Inspect the current checkout and working tree:
 
 ``` powershell
 git branch --show-current
 git log -1 --oneline
-git status -sb
-python -m pytest -q
+git status --short
 ```
 
-Expected branch: `person2/semantic-entropy`; latest known commit
-`ff4ffa0`. The last reported normal test run passed 148 tests. At the
-last status check, `tests/tests/test_se_nli.py` was modified and
-backups, diagnostics, `outputs/`, and `data/processed_backup/` were
-untracked. Preserve them while reviewing; do not broadly stage.
-
-### 6.2 Inspect validation checkpoint
+Inspect the validation output record counts:
 
 ``` powershell
-Get-Content outputs\detectors\_checkpoints\se_pair_validation_full_v1.jsonl | Measure-Object -Line
+(Get-Content outputs/detectors/se_global/nli/validation_validation_full_v1.jsonl | Measure-Object -Line).Lines
+(Get-Content outputs/detectors/se_candidate/nli/validation_validation_full_v1.jsonl | Measure-Object -Line).Lines
 ```
 
-This is a quick line count only, not a coverage proof. Before resuming,
-inspect runner CLI/help and checkpoint validation for unique IDs, config
-hash `435a3e4fb7b8`, prompt `v1`, and split `validation`.
-
-### 6.3 Inspect controlled-runner CLI
+Inspect the controlled-test output record counts:
 
 ``` powershell
-python -m src.detectors.semantic_entropy.runner_controlled_test --help
+(Get-Content outputs/detectors/se_global/nli/test_length_controlled_lc_full_v1.jsonl | Measure-Object -Line).Lines
+(Get-Content outputs/detectors/se_candidate/nli/test_length_controlled_lc_full_v1.jsonl | Measure-Object -Line).Lines
 ```
 
-Use actual CLI help as the source of truth for full-run flags and tag
-syntax. The known runner has a smoke limit of 2 and an `--all` option
-for the full 274 samples, but verify flags against the current checkout.
+These are line counts, not complete provenance or ID-alignment proofs.
+Validate unique IDs, expected coverage, metadata, finite scores, and
+matching IDs before publication.
 
-### 6.4 Existing smoke-output verifier
-
-``` powershell
-python verify_controlled_evaluator.py
-```
-
-This helper currently checks `lc_v1` smoke outputs. After a full run,
-point the verifier/evaluator at the full-run tag as appropriate; never
-treat the two-record files as full coverage.
-
-## 7. Evaluation rules
-
--   **Global SE:** Entropy over semantic cluster probabilities; low
-    entropy does not prove factual correctness.
--   **Candidate-aware score:** Candidate representation in sampled
-    clusters; interpret according to the current implementation and
-    score direction.
--   **Score direction:** Higher detector score means more likely
-    hallucinated under the shared contract.
--   **Threshold provenance:** Select on validation only, freeze it, and
-    record provenance.
--   **Matched pairs:** Report number of matches and ties; explain that
-    matched questions may differ.
--   **Length strata:** Report per-stratum sample counts as well as
-    metric values.
--   **Efficiency:** Report actual recorded generation
-    counts/tokens/runtime; do not invent missing values.
--   **Reproducibility:** Record config hash `435a3e4fb7b8`, prompt
-    version `v1`, model checkpoint, sampling settings, seeds, software
-    versions, hardware, and run tag.
-
-## 8. Risks and limitations
+## 7. Risks and limitations
 
 -   NLI equivalence can merge non-equivalent answers or split
     paraphrases; document model, threshold, and fallback behavior.
@@ -299,41 +300,62 @@ treat the two-record files as full coverage.
     probabilities and entropy.
 -   The controlled set controls answer length within a pair, not every
     confounder; pairs may have different questions.
--   The two-sample smoke run is integration evidence only.
+-   The global SE validation threshold has Youden J = 0, and its
+    controlled-test AUROC is below 0.5; investigate validation behavior
+    and score semantics.
+-   Candidate-aware results still include false positives and many
+    matched-pair ties.
+-   The full 2,000-example test split has not been evaluated in the
+    recorded results.
+-   Per-length-stratum metrics and verified efficiency details
+    (generation counts, tokens, runtime) are not included here because
+    they were not supplied in the recorded evaluation results.
 -   Any mismatch in expected coverage or metadata must stop evaluation
-    instead of dropping samples silently.
--   The last known working tree had an uncommitted nested NLI test and
-    untracked local artifacts; review carefully and avoid destructive
-    cleanup.
+    instead of silently dropping samples.
+-   Local backups, diagnostics, and generated outputs should be reviewed
+    before committing; do not broadly stage with `git add .`.
 
-## 9. Final acceptance checklist
+## 8. Final acceptance checklist
 
--   [ ] Validation covers all 1,001 pairs and passes metadata/coverage
-    checks.
--   [ ] Threshold selected on validation and frozen with provenance.
--   [ ] Controlled test covers all 274 samples, 137 matches, and
-    expected label counts.
--   [ ] Global and candidate-aware outputs have matching IDs and exact
-    coverage.
--   [ ] Final evaluation uses frozen validation threshold, not a
-    test-tuned threshold.
--   [ ] Report includes metrics, counts, match/tie results, length
-    strata, efficiency, and limitations.
--   [ ] Final claims rely on full runs, not the two-sample smoke run.
--   [ ] Required code/tests/docs are committed and pushed; backups and
-    generated outputs are excluded unless intentionally needed.
+-   [x] Validation covers all 1,001 pairs (2,002 records per detector)
+    with recorded metadata checks.
+-   [x] Thresholds selected on validation only and frozen with
+    provenance.
+-   [x] Controlled test covers all 274 samples, 137 matched pairs, and
+    balanced label counts.
+-   [x] Global and candidate-aware controlled outputs have expected
+    coverage and recorded matching IDs.
+-   [x] Controlled-test evaluation uses frozen validation thresholds,
+    not thresholds tuned on test.
+-   [x] Regression tests pass: 148 passed.
+-   [ ] Evaluate the full 2,000-example test split before making
+    full-test performance claims.
+-   [ ] Add length-stratified metrics and verified efficiency
+    measurements if available.
+-   [ ] Review and commit only intended code, test, and documentation
+    changes; exclude backups and unrelated generated artifacts.
 
-## 10. Safe teammate summary
+## 9. Safe teammate summary
 
-The Semantic Entropy workstream has an implemented and tested detector
-pipeline, a resumable validation runner, and a resumable
-length-controlled test runner. Latest known commit: `ff4ffa0` on
-`person2/semantic-entropy`; 148 tests pass. Full-scale validation and
-controlled-test experiments remain pending. Final performance claims
-require full coverage, validation-only threshold selection, and verified
-evaluator output. The two-sample controlled smoke run demonstrates
-integration only.
+The Person 2 Semantic Entropy workstream has an implemented and tested
+detector pipeline, a resumable validation runner, and a resumable
+length-controlled test runner. The recorded configuration is
+`435a3e4fb7b8` with prompt version `v1`, using Llama 3.2 3B Instruct NF4
+on HaluEval QA. The latest recorded regression run passed 148 tests.
 
-*This handoff reflects the recorded project status and contract. Verify
-commands and output metadata against the live checkout before
-publication.*
+Full validation completed over 1,001 pairs. Thresholds were selected on
+validation only: global SE `0.1625414866957241` (Youden J `0.0`) and
+candidate-aware SE `0.95` (Youden J `0.6313686313686313`). The
+length-controlled test evaluation covers 274 examples, not the full test
+split. Candidate-aware SE achieved 74.82% accuracy and 0.7472 AUROC;
+global SE achieved 45.26% accuracy and 0.4450 AUROC. Interpret these
+only as results on the controlled subset.
+
+The full 2,000-example test split remains unevaluated in this handoff.
+Investigate global SE validation/score behavior without test-driven
+tuning, and review the working tree before staging or publishing. The
+previously reported commit `ff4ffa0` is not a claim that the latest
+experiment artifacts or report changes have been committed.
+
+*This handoff reflects the recorded experiment results. Recheck the live
+checkout, output metadata, and Git state before publication.*
