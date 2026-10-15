@@ -374,15 +374,18 @@ ambiguity, or statements that begin with a candidate but later qualify or
 contradict it. The fixed-threshold figures are comparative validation
 results, not held-out test performance.
 
-The updated score distribution differs from the original. Select and
-record the updated variant's threshold using validation data only before
-evaluating the held-out test set. Do not use test labels for threshold
-selection.
+The updated score distribution differs from the original. Using the shared
+evaluator and validation data only, the experimental anchoring variant
+independently selected a Youden-J threshold of **0.95**, with a validation
+Youden-J value of **0.714286**. This threshold is recorded in
+outputs/detectors/se_candidate/nli/threshold_validation_anchor_v1.json.
+The original baseline threshold and outputs remain preserved. The held-out
+test split has not yet been evaluated with the updated matcher; evaluate it
+using the recorded validation-selected threshold without tuning on test labels.
 
 The full 2,000-example test split remains unevaluated with the updated
 matcher. Preserve the original baseline outputs and thresholds, review
 the working tree before staging, and confirm output metadata and Git state
 before publication.
-
 *This handoff reflects the currently reported experiment results. Recheck
 the live checkout, output metadata, and Git state before publication.*
