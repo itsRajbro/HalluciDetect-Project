@@ -341,21 +341,48 @@ The Person 2 Semantic Entropy workstream has an implemented and tested
 detector pipeline, a resumable validation runner, and a resumable
 length-controlled test runner. The recorded configuration is
 `435a3e4fb7b8` with prompt version `v1`, using Llama 3.2 3B Instruct NF4
-on HaluEval QA. The latest recorded regression run passed 148 tests.
+on HaluEval QA. The latest reported regression run passed 150 tests.
 
-Full validation completed over 1,001 pairs. Thresholds were selected on
-validation only: global SE `0.1625414866957241` (Youden J `0.0`) and
-candidate-aware SE `0.95` (Youden J `0.6313686313686313`). The
-length-controlled test evaluation covers 274 examples, not the full test
-split. Candidate-aware SE achieved 74.82% accuracy and 0.7472 AUROC;
-global SE achieved 45.26% accuracy and 0.4450 AUROC. Interpret these
-only as results on the controlled subset.
+Full validation completed over 1,001 pairs. The original thresholds were
+selected on validation only: global SE `0.1625414866957241` (Youden J
+`0.0`) and candidate-aware SE `0.95` (Youden J `0.6313686313686313`).
+The length-controlled test evaluation covers 274 examples, not the full
+test split. Candidate-aware SE achieved 74.82% accuracy and 0.7472 AUROC;
+global SE achieved 45.26% accuracy and 0.4450 AUROC. Interpret these only
+as results on the controlled subset.
 
-The full 2,000-example test split remains unevaluated in this handoff.
-Investigate global SE validation/score behavior without test-driven
-tuning, and review the working tree before staging or publishing. The
-previously reported commit `ff4ffa0` is not a claim that the latest
-experiment artifacts or report changes have been committed.
+### Experimental follow-up: short-answer anchoring matcher
 
-*This handoff reflects the recorded experiment results. Recheck the live
-checkout, output metadata, and Git state before publication.*
+A short-answer anchoring fallback was added to
+`src/detectors/semantic_entropy/nli_equivalence.py`. Saved generations from
+the existing validation checkpoint were rescored without regenerating
+answers. The original baseline outputs and threshold files were preserved.
+
+| Candidate-aware validation metric | Original matcher | Anchoring matcher |
+|---|---:|---:|
+| AUROC | 0.816634 | 0.858234 |
+| Accuracy at fixed threshold 0.95 | 81.57% | 85.71% |
+| F1 at fixed threshold 0.95 | 0.8352 | 0.8673 |
+| Factual candidate match rate | 69.73% | 78.02% |
+| Hallucinated candidate match rate | 6.59% | 6.59% |
+
+The changed-match review reported 83 decisions, all label-0 candidates
+changing from unmatched to matched. Several inspected examples appeared
+plausible, but this limited review does not establish that every new match
+is correct. The anchoring rule is heuristic and may fail on negation,
+ambiguity, or statements that begin with a candidate but later qualify or
+contradict it. The fixed-threshold figures are comparative validation
+results, not held-out test performance.
+
+The updated score distribution differs from the original. Select and
+record the updated variant's threshold using validation data only before
+evaluating the held-out test set. Do not use test labels for threshold
+selection.
+
+The full 2,000-example test split remains unevaluated with the updated
+matcher. Preserve the original baseline outputs and thresholds, review
+the working tree before staging, and confirm output metadata and Git state
+before publication.
+
+*This handoff reflects the currently reported experiment results. Recheck
+the live checkout, output metadata, and Git state before publication.*
