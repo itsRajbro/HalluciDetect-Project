@@ -1,0 +1,19 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-15T15:27:31+00:00",
+  "description": "Experimental candidate-aware validation output using the NLI short-answer anchoring matcher; metadata reconstructed from the existing JSONL and recorded run context.",
+  "detector": "se_candidate",
+  "extra": {
+    "run_tag": "validation_anchor_v1",
+    "matching_rule": "nli_short_answer_anchor_experimental",
+    "threshold_selected": false,
+    "metadata_reconstructed": true
+  },
+  "n_records": 2002,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "validation",
+  "threshold": null,
+  "threshold_source": null,
+  "variant": "nli_short_answer_anchor_experimental"
+}
