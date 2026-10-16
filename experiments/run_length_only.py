@@ -93,13 +93,15 @@ def main(argv=None) -> int:
                             n_bins=args.n_bins, save=True)
     E.print_summary(report)
     print("\nlength-stratified (test; quantile bins from validation lengths):")
-    print(f"  {'bin (chars)':<16}{'n':>5}{'%hall.':>8}{'acc':>9}{'recall':>9}{'spec.':>9}{'AUROC':>9}")
+    print(f"  {'bin (chars)':<16}{'n':>5}{'%hall.':>8}{'n_min':>7}{'acc':>9}{'recall':>9}{'spec.':>9}{'AUROC':>10}")
     for b in report["test"]["length_stratified"]:
         if b["n"]:
-            print(f"  {b['bin']:<16}{b['n']:>5}{b['frac_hallucinated']:>8.0%}{_f(b['accuracy']):>9}"
-                  f"{_f(b['recall']):>9}{_f(b['specificity']):>9}{_f(b['auroc']):>9}")
-    print("\nA bin that is almost one class (very low or very high %hall.) has an unreliable AUROC; "
-          "the length-controlled set is the cleaner test.")
+            auc = _f(b["auroc"]) + ("" if b["auroc_reliable"] else "*")
+            print(f"  {b['bin']:<16}{b['n']:>5}{b['frac_hallucinated']:>8.0%}{b['n_min']:>7}{_f(b['accuracy']):>9}"
+                  f"{_f(b['recall']):>9}{_f(b['specificity']):>9}{auc:>10}")
+    print(f"\n* AUROC rests on fewer than {E.MIN_CLASS_FOR_AUROC} samples in the smaller class (n_min): "
+          "too noisy to interpret. Read recall and specificity in such bins, not accuracy. "
+          "The length-controlled set is the cleaner test.")
     if args.plot:
         fig_path = REPO_ROOT / cfg.paths.results_dir / "figures" / f"length_only_{args.feature}.png"
         make_plot(report, test, fig_path)
