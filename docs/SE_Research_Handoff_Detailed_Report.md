@@ -1,4 +1,4 @@
-# Semantic Entropy (SE) — Research Handoff & Technical Report
+﻿# Semantic Entropy (SE) — Research Handoff & Technical Report
 
 **Project:** HalluciDetect-Project
 **Workstream:** Person 2 — Semantic Entropy (SE)
@@ -319,3 +319,66 @@ Thresholds were selected using validation data only. Candidate-aware scoring mer
 - `outputs/evaluation/se_candidate_length_controlled_lc_full_v1.json`
 
 **Latest confirmed commit:** `8a2d3e0` — `research: record length-controlled SE evaluation`
+
+## Full Test Evaluation — 16 October 2026
+
+### Evaluation protocol
+- Test split: 2,000 examples (1,000 factual and 1,000 hallucinated).
+- Configuration hash: `435a3e4fb7b8`; prompt version: `v1`.
+- Semantic equivalence variant: experimental NLI short-answer anchor.
+- Thresholds were frozen using validation data and were not tuned on the test set:
+  - Global SE: `0.1625414866957241`
+  - Candidate-aware SE: `0.95`
+
+### Full test results
+
+| Metric | Global SE | Candidate-aware SE |
+|---|---:|---:|
+| Accuracy | 49.85% | 86.05% |
+| Precision | 49.91% | 81.54% |
+| Recall | 86.60% | 93.20% |
+| F1 | 0.6333 | 0.8698 |
+| Specificity | 13.10% | 78.90% |
+| AUROC | 0.4962 | 0.8583 |
+| Pair-level accuracy | 49.70% | 85.25% |
+| Pair-level ties | 156 | 199 |
+
+### Length-stratified evaluation
+
+The evaluator used four answer-length bins. Bin AUROC values:
+
+| Answer length (characters) | Global SE AUROC | Candidate-aware SE AUROC |
+|---|---:|---:|
+| `[2, 12)` | 0.3623 | 0.8280 |
+| `[12, 28)` | 0.4336 | 0.8967 |
+| `[28, 57)` | 0.4795 | 0.6963 |
+| `[57, 313]` | 0.5999 | 0.4656 |
+
+The bins have substantially different label distributions, so their AUROC values should be interpreted cautiously. The longest bin has only eight factual examples, making its specificity and AUROC estimates particularly unstable.
+
+### Efficiency
+
+- Total test records: 2,000.
+- Total generations recorded: 20,000.
+- Total generated tokens recorded: 403,825.
+- Summed recorded runtime: 53,269.02 seconds (approximately 14.80 hours).
+- Mean recorded runtime per test record: 26.63 seconds.
+- Maximum recorded peak GPU memory: 4,283.76 MB.
+
+The global and candidate-aware outputs share the same generation run. Their efficiency figures must not be added together.
+
+### Interpretation and limitations
+
+Candidate-aware SE substantially outperformed global SE on this test set. Global SE achieved AUROC 0.4962 and specificity 13.10%, indicating poor discrimination at the frozen threshold. Its high recall does not compensate for the large number of false positives.
+
+Candidate-aware SE achieved AUROC 0.8583, but it is not a truth oracle. Its errors, length dependence, and 199 pair-level ties should remain part of the interpretation.
+
+Semantic equivalence relies on an experimental NLI short-answer matcher, which may incorrectly merge or separate answers. These findings apply to this dataset, configuration, matcher, and frozen thresholds; they do not establish generalization to other models or datasets.
+
+### Evaluation artifacts
+
+- `outputs/evaluation/full_test_anchor_v1_metrics_verified.json`
+- `outputs/evaluation/se_global_full_test_anchor_v1_metrics.json`
+- `outputs/evaluation/se_candidate_full_test_anchor_v1_metrics.json`
+
+The two detector-specific reports contain the detailed metrics, length-stratified breakdowns, and efficiency statistics.
