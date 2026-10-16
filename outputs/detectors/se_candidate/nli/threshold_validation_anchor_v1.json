@@ -1,0 +1,15 @@
+{
+  "detector": "se_candidate",
+  "variant": "nli_short_answer_anchor_experimental",
+  "config_hash": "435a3e4fb7b8",
+  "prompt_version": "v1",
+  "sample_count": 2002,
+  "threshold": {
+    "value": 0.95,
+    "criterion": "youden",
+    "criterion_value_on_validation": 0.7142857142857144,
+    "selected_on": "validation"
+  },
+  "score_convention": "higher = more likely hallucinated",
+  "validation_source": "outputs/detectors/se_candidate/nli/validation_validation_anchor_v1.jsonl"
+}

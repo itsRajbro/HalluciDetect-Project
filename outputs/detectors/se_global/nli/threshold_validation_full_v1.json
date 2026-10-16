@@ -1,0 +1,14 @@
+{
+  "detector": "se_global",
+  "variant": "nli",
+  "config_hash": "435a3e4fb7b8",
+  "prompt_version": "v1",
+  "sample_count": 2002,
+  "threshold": {
+    "value": 0.1625414866957241,
+    "criterion": "youden",
+    "criterion_value_on_validation": 0.0,
+    "selected_on": "validation"
+  },
+  "score_convention": "higher = more likely hallucinated"
+}

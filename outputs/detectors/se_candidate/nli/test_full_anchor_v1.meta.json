@@ -1,0 +1,19 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-16T06:10:20+00:00",
+  "description": "Full test evaluation full_anchor_v1; threshold fixed from validation.",
+  "detector": "se_candidate",
+  "extra": {
+    "experimental_matcher": "nli_short_answer_anchor_experimental",
+    "run_tag": "full_anchor_v1",
+    "threshold_selected": false,
+    "threshold_source": "validation"
+  },
+  "n_records": 2000,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "test",
+  "threshold": 0.95,
+  "threshold_source": "validation",
+  "variant": "nli"
+}

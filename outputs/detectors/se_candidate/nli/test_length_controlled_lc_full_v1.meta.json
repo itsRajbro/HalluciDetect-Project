@@ -1,0 +1,23 @@
+{
+  "config_hash": "435a3e4fb7b8",
+  "created_utc": "2026-10-15T07:37:14+00:00",
+  "description": "Length-controlled test run lc_full_v1; candidate-aware score. No threshold selected on test.",
+  "detector": "se_candidate",
+  "extra": {
+    "detector": "se_candidate",
+    "generation_seed_key": "sample_id",
+    "length_controlled": true,
+    "match_id_used_for_generation": false,
+    "n_samples": 274,
+    "run_tag": "lc_full_v1",
+    "threshold": null,
+    "threshold_selected": false
+  },
+  "n_records": 274,
+  "prompt_version": "v1",
+  "schema_version": "1",
+  "split": "test",
+  "threshold": null,
+  "threshold_source": null,
+  "variant": "nli"
+}
