@@ -4,7 +4,7 @@
 **Workstream:** Person 2 — Semantic Entropy (SE)
 **Branch:** `person2/semantic-entropy`
 **Status date:** 16 October 2026
-**Latest confirmed commit:** `a47f519` — research: record length-controlled SE evaluation
+**Latest confirmed commit:** `8a2d3e0` — research: record length-controlled SE evaluation
 **Current experiment tags:** `validation_full_v1`, `lc_full_v1`, `test_full_anchor_v1`
 
 > **Scope:** This report covers Semantic Entropy (SE), not Semantic Entropy Probes (SEP). SE uses sampled generations, semantic clusters, entropy, and candidate-aware scoring; SEP uses hidden-state features and a supervised probe.
@@ -38,7 +38,7 @@ Thresholds were selected using validation data only and frozen before test evalu
 | Full-test evaluation | Completed | `outputs/evaluation/full_test_anchor_v1_summary.json` |
 | Length-controlled test | Completed | 274 records per detector; 137 matched pairs |
 | Length-controlled evaluation | Completed | Evaluation JSON files saved for both detectors |
-| Git publication | Final artifacts published | Commit `a47f519` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
+| Git publication | Final artifacts published | Commit `8a2d3e0` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
 
 ## 1. Workstream Definition and Terminology
 
@@ -271,7 +271,7 @@ These checks are useful but do not alone prove complete provenance, unique IDs, 
 
 ## 10. Git and Publication Status
 
-The latest confirmed commit is `a47f519`, and the branch was synchronized with its remote at the last confirmed check.
+The latest confirmed commit is `8a2d3e0`, and the branch was synchronized with its remote at the last confirmed check.
 
 The length-controlled evaluation artifacts were committed and pushed. Full-test anchoring evaluation artifacts were also recorded as committed and pushed in the current work history.
 
@@ -318,4 +318,4 @@ Thresholds were selected using validation data only. Candidate-aware scoring mer
 - `outputs/evaluation/se_global_length_controlled_lc_full_v1.json`
 - `outputs/evaluation/se_candidate_length_controlled_lc_full_v1.json`
 
-**Latest confirmed commit:** `a47f519` — `research: record length-controlled SE evaluation`
+**Latest confirmed commit:** `8a2d3e0` — `research: record length-controlled SE evaluation`
