@@ -379,13 +379,58 @@ evaluator and validation data only, the experimental anchoring variant
 independently selected a Youden-J threshold of **0.95**, with a validation
 Youden-J value of **0.714286**. This threshold is recorded in
 outputs/detectors/se_candidate/nli/threshold_validation_anchor_v1.json.
-The original baseline threshold and outputs remain preserved. The held-out
-test split has not yet been evaluated with the updated matcher; evaluate it
-using the recorded validation-selected threshold without tuning on test labels.
+The original baseline threshold and outputs remain preserved. The full
+2,000-example held-out test split has now been evaluated with the updated
+anchoring matcher using thresholds selected on validation only. No threshold
+was tuned using test labels. See the Full Held-Out Test Evaluation section
+below for the recorded metrics and output paths.
 
-The full 2,000-example test split remains unevaluated with the updated
-matcher. Preserve the original baseline outputs and thresholds, review
-the working tree before staging, and confirm output metadata and Git state
-before publication.
+Before publication, verify sample-ID alignment, output metadata, baseline
+preservation, and the Git working tree. Stage only explicitly reviewed files.
 *This handoff reflects the currently reported experiment results. Recheck
 the live checkout, output metadata, and Git state before publication.*
+
+## Full Held-Out Test Evaluation — Anchoring Matcher
+
+The full held-out test evaluation used 2,000 samples (1,000 factual
+and 1,000 hallucinated) with thresholds frozen from validation. No
+threshold was selected or tuned using test labels.
+
+| Metric | Global SE | Candidate-aware SE |
+|---|---:|---:|
+| Threshold (validation) | 0.162541 | 0.95 |
+| Accuracy | 49.85% | 86.05% |
+| Precision | 49.91% | 81.54% |
+| Recall | 86.60% | 93.20% |
+| F1 | 63.33% | 86.98% |
+| Specificity | 13.10% | 78.90% |
+| AUROC | 0.4962 | 0.8583 |
+| Pair-level accuracy | 49.70% | 85.25% |
+
+### Confusion Matrices
+
+| Detector | TN | FP | FN | TP |
+|---|---:|---:|---:|---:|
+| Global SE | 131 | 869 | 134 | 866 |
+| Candidate-aware SE | 789 | 211 | 68 | 932 |
+
+### Interpretation and Limitations
+
+Candidate-aware SE substantially outperformed global SE on this held-out
+test split. Its AUROC of 0.8583 indicates useful ranking discrimination
+on this dataset, while global SE's AUROC of 0.4962 is close to random
+ranking. Global SE also had very low specificity (13.10%), producing
+many false positives at its frozen validation threshold.
+
+These results support the candidate-aware score for further investigation,
+not a claim of universal hallucination detection. The anchoring matcher
+is heuristic, and dataset label noise, answer length, and score
+distribution may affect results. The threshold remains fixed from
+validation; test results must not be used to retune it.
+
+Machine-readable summary:
+`outputs/evaluation/full_test_anchor_v1_summary.json`
+
+Test output files:
+- `outputs/detectors/se_global/nli/test_full_anchor_v1.jsonl`
+- `outputs/detectors/se_candidate/nli/test_full_anchor_v1.jsonl`
