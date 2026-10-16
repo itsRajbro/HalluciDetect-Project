@@ -379,7 +379,7 @@ evaluator and validation data only, the experimental anchoring variant
 independently selected a Youden-J threshold of **0.95**, with a validation
 Youden-J value of **0.714286**. This threshold is recorded in
 outputs/detectors/se_candidate/nli/threshold_validation_anchor_v1.json.
-The original baseline threshold and outputs remain preserved. The full
+The original threshold file remains available with its recorded value; historical preservation of all baseline outputs has not been independently verified. The full
 2,000-example held-out test split has now been evaluated with the updated
 anchoring matcher using thresholds selected on validation only. No threshold
 was tuned using test labels. See the Full Held-Out Test Evaluation section
@@ -390,7 +390,7 @@ preservation, and the Git working tree. Stage only explicitly reviewed files.
 *This handoff reflects the currently reported experiment results. Recheck
 the live checkout, output metadata, and Git state before publication.*
 
-## Full Held-Out Test Evaluation — Anchoring Matcher
+## Full Held-Out Test Evaluation - Anchoring Matcher
 
 The full held-out test evaluation used 2,000 samples (1,000 factual
 and 1,000 hallucinated) with thresholds frozen from validation. No
