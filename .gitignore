@@ -34,3 +34,24 @@ results/tables/*
 # Secrets
 .env
 *.key
+
+
+# Local experimental checkpoints
+outputs/detectors/_checkpoints/
+
+# Local diagnostic outputs
+outputs/diagnostics/
+outputs/benchmarks/
+
+# Temporary diagnostic scripts
+diagnose_generation.py
+diagnose_matching.py
+diagnose_nli.py
+verify_controlled_evaluator.py
+verify_se_outputs.py
+verify_shared_evaluator.py
+
+# Local backup files
+data/processed_backup/
+*.bak
+*.before_fix
