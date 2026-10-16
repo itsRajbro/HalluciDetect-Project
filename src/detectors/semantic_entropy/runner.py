@@ -7,6 +7,7 @@ Never loads the test split or selects a threshold.
 from __future__ import annotations
 
 import argparse
+import json
 import time
 from pathlib import Path
 
@@ -56,6 +57,11 @@ def run_validation(limit: int | None = 2, output_tag: str = "smoke") -> None:
 
     global_records = []
     candidate_records = []
+    raw_generations_path = base / "se_generations" / "nli" / f"validation_{output_tag}.jsonl"
+    raw_generations_path.parent.mkdir(parents=True, exist_ok=True)
+    if raw_generations_path.exists():
+        raise FileExistsError(f"Raw generations already exist: {raw_generations_path}")
+    raw_generation_rows = []
 
     for index, sample in enumerate(samples, start=1):
         print(f"[{index}/{len(samples)}] {sample.sample_id}", flush=True)
@@ -70,6 +76,16 @@ def run_validation(limit: int | None = 2, output_tag: str = "smoke") -> None:
             cfg=cfg,
         )
         answers = [g.text for g in output.generations]
+        for generation in output.generations:
+            raw_generation_rows.append({
+                **generation.to_dict(),
+                "split": "validation",
+                "config_hash": cfg.config_hash(),
+                "generation_config_hash": output.stats.config_hash,
+                "prompt_version": cfg.prompt.version,
+                "wall_time_s": output.stats.wall_time_s,
+                "prompt_num_tokens": output.stats.prompt_num_tokens,
+            })
 
         if not answers or any(not answer.strip() for answer in answers):
             raise RuntimeError(
@@ -124,6 +140,11 @@ def run_validation(limit: int | None = 2, output_tag: str = "smoke") -> None:
                 **common,
             )
         )
+
+    with raw_generations_path.open("x", encoding="utf-8", newline="\\n") as raw_file:
+        for row in raw_generation_rows:
+            raw_file.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\\n")
+    print(f"Raw generations: {raw_generations_path}")
 
     description = (
         f"Validation {output_tag} run; scores only; no threshold selected."
