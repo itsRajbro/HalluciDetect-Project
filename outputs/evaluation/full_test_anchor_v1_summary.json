@@ -1,0 +1,60 @@
+{
+  "experiment": "full_anchor_v1",
+  "split": "test",
+  "sample_count": 2000,
+  "threshold_source": "validation",
+  "results": {
+    "se_global": {
+      "threshold": 0.1625414866957241,
+      "threshold_source": "validation",
+      "test_metrics": {
+        "n": 2000,
+        "n_pos": 1000,
+        "n_neg": 1000,
+        "accuracy": 0.4985,
+        "precision": 0.49913544668587895,
+        "recall": 0.866,
+        "f1": 0.63327239488117,
+        "specificity": 0.131,
+        "confusion_matrix": {
+          "tn": 131,
+          "fp": 869,
+          "fn": 134,
+          "tp": 866
+        },
+        "auroc": 0.4962155
+      },
+      "pair_level": {
+        "n_pairs": 1000,
+        "pair_accuracy": 0.497,
+        "n_ties": 156
+      }
+    },
+    "se_candidate": {
+      "threshold": 0.95,
+      "threshold_source": "validation",
+      "test_metrics": {
+        "n": 2000,
+        "n_pos": 1000,
+        "n_neg": 1000,
+        "accuracy": 0.8605,
+        "precision": 0.8153980752405949,
+        "recall": 0.932,
+        "f1": 0.8698086794213719,
+        "specificity": 0.789,
+        "confusion_matrix": {
+          "tn": 789,
+          "fp": 211,
+          "fn": 68,
+          "tp": 932
+        },
+        "auroc": 0.858337
+      },
+      "pair_level": {
+        "n_pairs": 1000,
+        "pair_accuracy": 0.8525,
+        "n_ties": 199
+      }
+    }
+  }
+}
