@@ -141,9 +141,9 @@ def run_validation(limit: int | None = 2, output_tag: str = "smoke") -> None:
             )
         )
 
-    with raw_generations_path.open("x", encoding="utf-8", newline="\\n") as raw_file:
+    with raw_generations_path.open("x", encoding="utf-8", newline="\n") as raw_file:
         for row in raw_generation_rows:
-            raw_file.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\\n")
+            raw_file.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
     print(f"Raw generations: {raw_generations_path}")
 
     description = (
