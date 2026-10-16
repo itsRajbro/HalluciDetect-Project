@@ -1,10 +1,10 @@
-﻿# Semantic Entropy (SE) â€” Research Handoff & Technical Report
+# Semantic Entropy (SE) — Research Handoff & Technical Report
 
 **Project:** HalluciDetect-Project
-**Workstream:** Person 2 â€” Semantic Entropy (SE)
+**Workstream:** Person 2 — Semantic Entropy (SE)
 **Branch:** `person2/semantic-entropy`
 **Status date:** 16 October 2026
-**Latest confirmed commit:** `a1a18ba` â€” research: record length-controlled SE evaluation
+**Latest confirmed commit:** `a47f519` — research: record length-controlled SE evaluation
 **Current experiment tags:** `validation_full_v1`, `lc_full_v1`, `test_full_anchor_v1`
 
 > **Scope:** This report covers Semantic Entropy (SE), not Semantic Entropy Probes (SEP). SE uses sampled generations, semantic clusters, entropy, and candidate-aware scoring; SEP uses hidden-state features and a supervised probe.
@@ -31,14 +31,14 @@ Thresholds were selected using validation data only and frozen before test evalu
 | Area | Status | Evidence |
 |---|---|---|
 | Implementation | Implemented | Shared pipeline, entropy, clustering, candidate-aware scoring, NLI equivalence, and runners |
-| Automated tests | Passed | `python -m pytest -q` â€” 150 passed in 43.61s |
+| Automated tests | Passed | `python -m pytest -q` — 150 passed in 43.61s |
 | Validation | Completed | 1,001 pairs; 2,002 records per detector |
 | Validation thresholds | Selected and frozen | Thresholds selected using validation data only |
 | Full held-out test | Completed | 2,000 samples per detector |
 | Full-test evaluation | Completed | `outputs/evaluation/full_test_anchor_v1_summary.json` |
 | Length-controlled test | Completed | 274 records per detector; 137 matched pairs |
 | Length-controlled evaluation | Completed | Evaluation JSON files saved for both detectors |
-| Git publication | Final artifacts published | Commit `a1a18ba` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
+| Git publication | Final artifacts published | Commit `a47f519` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
 
 ## 1. Workstream Definition and Terminology
 
@@ -64,16 +64,16 @@ Preserve sample IDs, pair IDs, match IDs, split labels, config hash, prompt vers
 
 Relevant implementation files include:
 
-- `src/common/generation.py` â€” generation outputs and statistics.
-- `src/common/data.py` â€” split loading, pair grouping, controlled-test loading, and match grouping.
-- `src/common/schema.py` â€” detector records, JSONL/metadata read/write, efficiency and coverage helpers.
-- `src/common/evaluator.py` â€” score alignment, AUROC, classification metrics, threshold selection, pair/match metrics, length strata, and run evaluation.
-- `src/detectors/semantic_entropy/entropy.py` â€” Shannon entropy over cluster probabilities.
-- `src/detectors/semantic_entropy/clustering.py` â€” exact baseline clustering with optional equivalence predicate.
-- `src/detectors/semantic_entropy/candidate_aware.py` â€” candidate-cluster probability and score `1 - probability`.
-- `src/detectors/semantic_entropy/nli_equivalence.py` â€” NLI equivalence and short-answer anchoring behavior.
-- `src/detectors/semantic_entropy/runner_pair_checkpoint.py` â€” resumable pair-aware validation runner.
-- `src/detectors/semantic_entropy/runner_controlled_test.py` â€” resumable length-controlled test runner.
+- `src/common/generation.py` — generation outputs and statistics.
+- `src/common/data.py` — split loading, pair grouping, controlled-test loading, and match grouping.
+- `src/common/schema.py` — detector records, JSONL/metadata read/write, efficiency and coverage helpers.
+- `src/common/evaluator.py` — score alignment, AUROC, classification metrics, threshold selection, pair/match metrics, length strata, and run evaluation.
+- `src/detectors/semantic_entropy/entropy.py` — Shannon entropy over cluster probabilities.
+- `src/detectors/semantic_entropy/clustering.py` — exact baseline clustering with optional equivalence predicate.
+- `src/detectors/semantic_entropy/candidate_aware.py` — candidate-cluster probability and score `1 - probability`.
+- `src/detectors/semantic_entropy/nli_equivalence.py` — NLI equivalence and short-answer anchoring behavior.
+- `src/detectors/semantic_entropy/runner_pair_checkpoint.py` — resumable pair-aware validation runner.
+- `src/detectors/semantic_entropy/runner_controlled_test.py` — resumable length-controlled test runner.
 
 Recorded experiment configuration:
 
@@ -122,7 +122,7 @@ The experimental anchoring variant independently selected a candidate-aware thre
 
 The global SE threshold has validation Youden J equal to zero. Its score distribution, direction, and validation behavior warrant further investigation. Do not tune the threshold using test labels.
 
-## 5. Full Held-Out Test Evaluation â€” Anchoring Matcher
+## 5. Full Held-Out Test Evaluation — Anchoring Matcher
 
 The full held-out test evaluation used 2,000 samples: 1,000 factual and 1,000 hallucinated. Thresholds were frozen from validation. No threshold was selected or tuned using test labels.
 
@@ -271,7 +271,7 @@ These checks are useful but do not alone prove complete provenance, unique IDs, 
 
 ## 10. Git and Publication Status
 
-The latest confirmed commit is `a1a18ba`, and the branch was synchronized with its remote at the last confirmed check.
+The latest confirmed commit is `a47f519`, and the branch was synchronized with its remote at the last confirmed check.
 
 The length-controlled evaluation artifacts were committed and pushed. Full-test anchoring evaluation artifacts were also recorded as committed and pushed in the current work history.
 
@@ -318,4 +318,4 @@ Thresholds were selected using validation data only. Candidate-aware scoring mer
 - `outputs/evaluation/se_global_length_controlled_lc_full_v1.json`
 - `outputs/evaluation/se_candidate_length_controlled_lc_full_v1.json`
 
-**Latest confirmed commit:** `a1a18ba` â€” `research: record length-controlled SE evaluation`
+**Latest confirmed commit:** `a47f519` — `research: record length-controlled SE evaluation`
