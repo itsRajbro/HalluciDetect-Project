@@ -1,0 +1,38 @@
+{
+  "detector": "se_global",
+  "variant": "nli",
+  "config_hash": "435a3e4fb7b8",
+  "prompt_version": "v1",
+  "evaluation_split": "length_controlled_test",
+  "sample_count": 274,
+  "threshold": {
+    "value": 0.1625414866957241,
+    "criterion": "youden",
+    "criterion_value_on_validation": 0.0,
+    "selected_on": "validation"
+  },
+  "threshold_source": "validation_only",
+  "metrics": {
+    "n": 274,
+    "n_pos": 137,
+    "n_neg": 137,
+    "accuracy": 0.45255474452554745,
+    "precision": 0.4721030042918455,
+    "recall": 0.8029197080291971,
+    "f1": 0.5945945945945946,
+    "specificity": 0.10218978102189781,
+    "confusion_matrix": {
+      "tn": 14,
+      "fp": 123,
+      "fn": 27,
+      "tp": 110
+    },
+    "auroc": 0.4450423570781608
+  },
+  "match_level": {
+    "n_matches": 137,
+    "match_accuracy": 0.4343065693430657,
+    "n_ties": 1
+  },
+  "warning": "Controlled-test results are final evaluation only; do not retune threshold from these results."
+}
