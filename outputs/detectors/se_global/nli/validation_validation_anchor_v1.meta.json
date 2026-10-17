@@ -1,0 +1,18 @@
+{
+  "schema_version": "1",
+  "detector": "se_global",
+  "variant": "nli",
+  "split": "validation",
+  "config_hash": "435a3e4fb7b8",
+  "prompt_version": "v1",
+  "n_records": 2002,
+  "threshold": null,
+  "threshold_source": null,
+  "description": "Reconstructed metadata for existing anchored validation scores; not emitted by original run.",
+  "extra": {
+    "run_tag": "validation_anchor_v1",
+    "experimental_matcher": "nli_short_answer_anchor_experimental",
+    "threshold_selected": false,
+    "metadata_reconstructed": true
+  }
+}

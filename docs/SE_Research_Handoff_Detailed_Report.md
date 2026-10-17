@@ -382,3 +382,12 @@ Semantic equivalence relies on an experimental NLI short-answer matcher, which m
 - `outputs/evaluation/se_candidate_full_test_anchor_v1_metrics.json`
 
 The two detector-specific reports contain the detailed metrics, length-stratified breakdowns, and efficiency statistics.
+## Anchored Validation Diagnostic — 17 October 2026
+
+- Anchored validation contains 2,002 records across 1,001 matched pairs.
+- Global semantic entropy assigns identical scores to both members of all 1,001 pairs. Validation AUROC is 0.5000 and Youden's J is 0.0000. Threshold tuning cannot resolve this paired-label limitation.
+- Candidate-aware SE produces different scores for 759/1,001 pairs (75.8%).
+- Candidate-aware threshold selected on validation: 0.95 (Youden's J = 0.714286).
+- Candidate-aware validation metrics at threshold 0.95: accuracy 0.8571, precision 0.8095, recall 0.9341, specificity 0.7802, F1 0.8673, AUROC 0.8582.
+- Global anchored validation metadata was reconstructed because the original metadata file was missing. It must not be represented as original run-emitted metadata.
+- No threshold was tuned using test labels. Global SE's paired-label limitation is specific to this evaluation setup and does not establish that global SE is universally ineffective.
