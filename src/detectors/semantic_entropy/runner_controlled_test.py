@@ -218,7 +218,6 @@ def run(limit: int | None, tag: str) -> None:
                 "length_controlled": True,
                 "match_id": sample.match_id,
                 "pair_id": sample.pair_id,
-                "candidate_label": sample.label,
             },
             **shared,
         ).to_dict()
@@ -236,7 +235,6 @@ def run(limit: int | None, tag: str) -> None:
                 "length_controlled": True,
                 "match_id": sample.match_id,
                 "pair_id": sample.pair_id,
-                "candidate_label": sample.label,
             },
             **shared,
         ).to_dict()
