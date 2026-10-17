@@ -266,7 +266,6 @@ def main() -> None:
                 extra={
                     "threshold": float(threshold),
                     "threshold_source": "validation",
-                    "label": int(label),
                 },
             )
             for sample_id, label, score in zip(

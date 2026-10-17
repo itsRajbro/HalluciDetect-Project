@@ -228,57 +228,6 @@ def match_level(ctrl_samples: Sequence[Sample], scored: dict[str, dict]) -> dict
     return {"n_matches": n, "match_accuracy": (wins + 0.5 * ties) / n if n else None, "n_ties": int(ties)}
 
 
-def _bootstrap_confidence_intervals(
-    y: np.ndarray,
-    pred: np.ndarray,
-    scores: np.ndarray,
-    groups: Sequence[Any],
-    *,
-    n_boot: int = 1000,
-    seed: int = 42,
-) -> dict:
-    """Percentile bootstrap CIs, resampling whole groups."""
-    if n_boot <= 0:
-        return {}
-
-    rng = np.random.default_rng(seed)
-    y = np.asarray(y, dtype=int)
-    pred = np.asarray(pred, dtype=int)
-    scores = np.asarray(scores, dtype=float)
-    groups = np.asarray(groups)
-
-    unique_groups = np.unique(groups)
-    values = {
-        name: []
-        for name in ("accuracy", "precision", "recall", "f1", "auroc")
-    }
-
-    for _ in range(n_boot):
-        chosen = rng.choice(unique_groups, size=len(unique_groups), replace=True)
-        indices = np.concatenate([
-            np.flatnonzero(groups == group) for group in chosen
-        ])
-
-        metrics = compute_metrics(y[indices], pred[indices], scores[indices])
-        for name in values:
-            value = metrics[name]
-            if value is not None and np.isfinite(value):
-                values[name].append(float(value))
-
-    intervals = {}
-    for name, samples in values.items():
-        if samples:
-            lo, hi = np.percentile(samples, [2.5, 97.5])
-            intervals[name] = {"lo": float(lo), "hi": float(hi)}
-        else:
-            intervals[name] = {"lo": None, "hi": None}
-
-    return {
-        "n_boot": n_boot,
-        "cluster": "pair",
-        "metrics": intervals,
-    }
-
 def length_edges(lengths: np.ndarray, n_bins: int = 4) -> list[float]:
     """Quantile bin edges (de-duplicated). Compute once and reuse across detectors."""
     qs = np.linspace(0, 1, n_bins + 1)
