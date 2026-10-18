@@ -1,0 +1,57 @@
+{
+  "train_rows": 15998,
+  "test_rows": 2000,
+  "baseline_with_length": {
+    "model": "formatting_plus_length",
+    "features": [
+      "char_count",
+      "word_count",
+      "avg_word_length",
+      "uppercase_ratio",
+      "lowercase_ratio",
+      "digit_ratio",
+      "punctuation_ratio",
+      "whitespace_ratio",
+      "unique_char_ratio",
+      "starts_uppercase",
+      "ends_punctuation",
+      "comma_ratio",
+      "period_ratio",
+      "question_mark_ratio",
+      "exclamation_ratio",
+      "parenthesis_ratio",
+      "non_ascii_ratio"
+    ],
+    "test_auroc": 0.9822725000000001,
+    "test_accuracy": 0.9745,
+    "test_precision": 0.9856704196519959,
+    "test_recall": 0.963,
+    "test_f1": 0.9742033383915023
+  },
+  "baseline_without_char_and_word_counts": {
+    "model": "surface_features_without_explicit_length",
+    "features": [
+      "avg_word_length",
+      "uppercase_ratio",
+      "lowercase_ratio",
+      "digit_ratio",
+      "punctuation_ratio",
+      "whitespace_ratio",
+      "unique_char_ratio",
+      "starts_uppercase",
+      "ends_punctuation",
+      "comma_ratio",
+      "period_ratio",
+      "question_mark_ratio",
+      "exclamation_ratio",
+      "parenthesis_ratio",
+      "non_ascii_ratio"
+    ],
+    "test_auroc": 0.9826165,
+    "test_accuracy": 0.9745,
+    "test_precision": 0.9856704196519959,
+    "test_recall": 0.963,
+    "test_f1": 0.9742033383915023
+  },
+  "caution": "The second model excludes raw character and word counts, but some ratios and formatting features may still correlate with answer length. These are diagnostic baselines, not proof of semantic generalization."
+}

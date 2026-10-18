@@ -1,0 +1,51 @@
+{
+  "caliper_characters": 5,
+  "matching_method": "greedy one-to-one matching without replacement",
+  "matched_pairs": 140,
+  "matched_rows": 280,
+  "test_coverage": 0.14,
+  "mean_char_difference": 0.2714285714285714,
+  "models": {
+    "SEP": {
+      "auroc": 0.9948979591836734,
+      "accuracy": 0.9642857142857143,
+      "auroc_95_ci": [
+        0.9867818877551019,
+        0.9997448979591836
+      ],
+      "accuracy_95_ci": [
+        0.9428571428571428,
+        0.9857142857142858
+      ]
+    },
+    "length_only": {
+      "auroc": 0.5814285714285715,
+      "accuracy": 0.6142857142857143,
+      "auroc_95_ci": [
+        0.5514011479591837,
+        0.6148775510204082
+      ],
+      "accuracy_95_ci": [
+        0.5785714285714286,
+        0.6535714285714286
+      ]
+    },
+    "formatting_only": {
+      "auroc": 0.816734693877551,
+      "accuracy": 0.8464285714285714,
+      "auroc_95_ci": [
+        0.7655522959183675,
+        0.8656696428571429
+      ],
+      "accuracy_95_ci": [
+        0.8071428571428572,
+        0.8857142857142857
+      ]
+    }
+  },
+  "bootstrap": {
+    "replicates": 2000,
+    "seed": 42
+  },
+  "warning": "Matching controls character length only, not punctuation or style. Greedy matching is not globally optimal. Matched-subset results may not generalize to the full test set."
+}

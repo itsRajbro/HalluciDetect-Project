@@ -244,7 +244,7 @@ def main() -> None:
     )
 
     # Save validation and test detector records.
-    # DetectorRecord accepts labels/threshold metadata through "extra".
+    # Ground-truth labels are kept separate; extra stores threshold metadata.
     for split_name, ids, labels, scores in [
         ("val", ids_v, yv, val_scores),
         ("test", ids_t, yt, test_scores),
