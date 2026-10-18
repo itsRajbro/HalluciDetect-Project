@@ -1,0 +1,16 @@
+{
+  "caliper_characters": 5,
+  "matching_method": "greedy closest eligible pairs without replacement",
+  "test_rows": 2000,
+  "matched_pairs": 140,
+  "matched_rows": 280,
+  "test_coverage": 0.14,
+  "mean_absolute_char_difference": 0.2714285714285714,
+  "max_absolute_char_difference": 5,
+  "mean_absolute_word_difference": 1.0357142857142858,
+  "sep_matched_auroc": 0.9948979591836734,
+  "sep_matched_accuracy_at_original_threshold": 0.9642857142857143,
+  "length_only_matched_auroc": 0.5814285714285715,
+  "threshold": 0.9854559515186279,
+  "warning": "Matching is greedy, not globally optimal. Interpret results alongside matched sample coverage."
+}

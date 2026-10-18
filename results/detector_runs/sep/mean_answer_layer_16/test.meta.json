@@ -1,9 +1,23 @@
 {
   "config_hash": "435a3e4fb7b8",
   "created_utc": "2026-10-14T04:27:19+00:00",
-  "description": "",
+  "description": "SEP supervised hidden-state probe using mean_answer pooling at layer 16. LogisticRegression with StandardScaler, fitted on cached training features. Threshold selected using validation data; test split used for final evaluation.",
   "detector": "sep",
-  "extra": {},
+  "extra": {
+    "probe_path": "outputs/detector_models/sep/mean_answer_layer_16/probe.joblib",
+    "probe_sha256": "605a8d4410fcaf1cf674df7e46093cf6f3e3ff1d9d977bea60d666ce995832fa",
+    "feature_dimension": 3072,
+    "pooling": "mean_answer",
+    "selected_layer": 16,
+    "threshold_rule": "pred_label = 1 iff score >= threshold",
+    "threshold_selection": "selected using validation F1; not tuned on test",
+    "splits_used": [
+      "train",
+      "validation",
+      "test"
+    ],
+    "training_note": "Existing cached features and saved run; no retraining performed for this metadata update."
+  },
   "n_records": 2000,
   "prompt_version": "v1",
   "schema_version": "1",

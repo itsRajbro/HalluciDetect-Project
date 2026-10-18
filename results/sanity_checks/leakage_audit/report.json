@@ -1,0 +1,88 @@
+{
+  "dataset_counts": {
+    "train_rows": 15998,
+    "validation_rows": 2002,
+    "test_rows": 2000
+  },
+  "overlaps": {
+    "train_vs_validation": {
+      "pair_id_unique_overlap": 0,
+      "question_unique_overlap": 0,
+      "knowledge_unique_overlap": 9,
+      "answer_unique_overlap": 183,
+      "question_knowledge_unique_overlap": 0
+    },
+    "train_vs_test": {
+      "pair_id_unique_overlap": 0,
+      "question_unique_overlap": 0,
+      "knowledge_unique_overlap": 10,
+      "answer_unique_overlap": 175,
+      "question_knowledge_unique_overlap": 0
+    },
+    "validation_vs_test": {
+      "pair_id_unique_overlap": 0,
+      "question_unique_overlap": 0,
+      "knowledge_unique_overlap": 0,
+      "answer_unique_overlap": 56,
+      "question_knowledge_unique_overlap": 0
+    }
+  },
+  "metrics": {
+    "all_test": {
+      "n_rows": 2000,
+      "n_pairs": 1000,
+      "label_0": 1000,
+      "label_1": 1000,
+      "auroc": 0.9995539999999998,
+      "accuracy": 0.989,
+      "precision": 0.9989795918367347,
+      "recall": 0.979,
+      "f1": 0.9888888888888889,
+      "threshold": 0.9854559515186279
+    },
+    "test_without_train_knowledge_overlap": {
+      "n_rows": 1980,
+      "n_pairs": 990,
+      "label_0": 990,
+      "label_1": 990,
+      "auroc": 0.9995469850015305,
+      "accuracy": 0.9888888888888889,
+      "precision": 0.9989690721649485,
+      "recall": 0.9787878787878788,
+      "f1": 0.9887755102040816,
+      "threshold": 0.9854559515186279
+    },
+    "test_without_train_knowledge_or_answer_overlap": {
+      "n_rows": 1444,
+      "n_pairs": 722,
+      "label_0": 722,
+      "label_1": 722,
+      "auroc": 0.9992748674426992,
+      "accuracy": 0.9861495844875346,
+      "precision": 0.9985795454545454,
+      "recall": 0.9736842105263158,
+      "f1": 0.9859747545582047,
+      "threshold": 0.9854559515186279
+    }
+  },
+  "excluded_test_pairs": {
+    "knowledge_seen_in_train": {
+      "excluded_pair_count": 10,
+      "excluded_row_count": 20,
+      "remaining_pair_count": 990,
+      "remaining_row_count": 1980
+    },
+    "knowledge_or_answer_seen_in_train": {
+      "excluded_pair_count": 278,
+      "excluded_row_count": 556,
+      "remaining_pair_count": 722,
+      "remaining_row_count": 1444
+    }
+  },
+  "normalization": "Unicode NFKC, casefold, whitespace normalization",
+  "threshold": 0.9854559515186279,
+  "test_answer_overlap": {
+    "rows_with_answer_seen_in_train": 279,
+    "rows_with_opposite_label_answer_in_train": 23
+  }
+}

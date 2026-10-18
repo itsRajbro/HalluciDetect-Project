@@ -1,0 +1,14 @@
+{
+  "experiment": "length_only_char_and_word_count",
+  "train_rows": 15998,
+  "test_rows": 2000,
+  "features": [
+    "answer_character_count",
+    "answer_word_count"
+  ],
+  "test_auroc": 0.9681244999999999,
+  "test_accuracy": 0.943,
+  "test_precision": 0.9567010309278351,
+  "test_recall": 0.928,
+  "test_f1": 0.9421319796954315
+}
