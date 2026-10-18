@@ -11,7 +11,10 @@
     "n_samples": 274,
     "run_tag": "lc_full_v1",
     "threshold": null,
-    "threshold_selected": false
+    "threshold_selected": false,
+    "generation_statistics_unit": "sample",
+    "nli_model_id": "facebook/bart-large-mnli",
+    "nli_model_revision": "d7645e127eaf1aefc7862fd59a17a5aa8558b8ce"
   },
   "n_records": 274,
   "prompt_version": "v1",

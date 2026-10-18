@@ -7,7 +7,10 @@
     "experimental_matcher": "nli_short_answer_anchor_experimental",
     "run_tag": "full_anchor_v1",
     "threshold_selected": false,
-    "threshold_source": "validation"
+    "threshold_source": "validation",
+    "generation_statistics_unit": "sample",
+    "nli_model_id": "facebook/bart-large-mnli",
+    "nli_model_revision": "d7645e127eaf1aefc7862fd59a17a5aa8558b8ce"
   },
   "n_records": 2000,
   "prompt_version": "v1",
