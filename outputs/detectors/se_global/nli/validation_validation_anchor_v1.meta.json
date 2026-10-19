@@ -13,6 +13,10 @@
     "run_tag": "validation_anchor_v1",
     "experimental_matcher": "nli_short_answer_anchor_experimental",
     "threshold_selected": false,
-    "metadata_reconstructed": true
+    "metadata_reconstructed": true,
+    "generation_statistics_unit": "pair",
+    "pair_generation": true,
+    "generation_seed_key": "pair_id",
+    "n_pairs": 1001
   }
 }

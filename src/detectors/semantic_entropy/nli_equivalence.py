@@ -9,6 +9,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 MODEL_ID = "facebook/bart-large-mnli"
+MODEL_REVISION = "d7645e127eaf1aefc7862fd59a17a5aa8558b8ce"
 BIDIRECTIONAL_THRESHOLD = 0.85
 SHORT_ANSWER_THRESHOLD = 0.85
 
@@ -40,8 +41,14 @@ class NLISemanticEquivalence:
     )
 
     def __init__(self, model_id: str = MODEL_ID):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_id)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_id,
+            revision=MODEL_REVISION,
+        )
+        self.model = AutoModelForSequenceClassification.from_pretrained(
+            model_id,
+            revision=MODEL_REVISION,
+        )
         self.model.eval()
 
         self.device = torch.device(
@@ -67,6 +74,16 @@ class NLISemanticEquivalence:
             raise ValueError(
                 "Could not identify the NLI entailment label"
             )
+
+        self.model_id = model_id
+        self.model_revision = MODEL_REVISION
+
+    def provenance(self) -> dict:
+        """Return NLI model identity for embedding in run metadata."""
+        return {
+            "nli_model_id": self.model_id,
+            "nli_model_revision": self.model_revision,
+        }
 
     @lru_cache(maxsize=4096)
     def _entailment_probability(

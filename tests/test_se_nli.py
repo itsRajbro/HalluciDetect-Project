@@ -1,5 +1,4 @@
-﻿
-from src.detectors.semantic_entropy.clustering import cluster_answers
+﻿from src.detectors.semantic_entropy.clustering import cluster_answers
 from src.detectors.semantic_entropy.nli_equivalence import (
     NLISemanticEquivalence,
 )
@@ -59,3 +58,13 @@ def test_nli_numeric_short_answer():
     assert equivalent("42", "The answer is 42.")
 
     assert not equivalent("42", "The answer is not 42.")
+
+
+def test_nli_exact_match_short_answer():
+    """Moved from tests/tests/test_se_candidate.py (duplicate file, E7 cleanup)."""
+    equivalent = NLISemanticEquivalence()
+
+    assert equivalent(
+        "Albert Hammond was born in 1944.",
+        "Albert Hammond was born in 1944.",
+    )
