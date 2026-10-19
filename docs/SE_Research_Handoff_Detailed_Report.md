@@ -7,7 +7,7 @@
 
 **Status date:** 18 October 2026
 
-**Latest confirmed commit:** `870acad` — fix: finalize semantic entropy evaluation metadata
+**Latest confirmed commit:** `0e1dec2` — docs: clarify exploratory semantic entropy evaluation
 
 **Current experiment tags:** `validation_full_v1`, `lc_full_v1`, `test_full_anchor_v1`
 
@@ -51,7 +51,7 @@ Thresholds were selected using validation data only and frozen before test evalu
 
 | Length-controlled evaluation | Completed | Evaluation JSON files saved for both detectors |
 
-| Git publication | Final artifacts published | Commit `870acad` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
+| Git publication | Final artifacts published | Commit `0e1dec2` is synchronized with the remote; local intermediate untracked artifacts remain and should be reviewed separately |
 
 ## 1. Workstream Definition and Terminology
 Semantic entropy measures uncertainty over semantic answer clusters rather than raw token-level variation. The pipeline samples multiple answers for an input, groups semantically equivalent answers, and computes entropy over cluster probabilities. Candidate-aware scoring measures how represented a supplied candidate is among generated answers.
@@ -239,6 +239,24 @@ Candidate-aware SE outperformed global SE on this controlled subset. However, it
 
 Matched pairs control answer length within a pair, not all confounders. Some pairs may use different original questions, so matched-pair metrics require cautious interpretation. The controlled subset should not be treated as a replacement for the full test split.
 
+### Global SE Controlled-Subset Score Discrepancy
+
+A verification compared two saved score sources on the same 274 length-controlled
+samples. The dedicated `lc_full_v1` run gives AUROC **0.4450423571**, while
+restricting the full-test scores to those same samples gives AUROC
+**0.4460546646**. The two score sources differ for one sample, `S009097_0`;
+the other 273 scores match. The dedicated run metadata records `sample_id` as
+the generation seed key and `match_id_used_for_generation` as `false`.
+The reason for the single-sample score difference has not been established.
+The reported controlled-run metrics above remain tied to the dedicated
+length-controlled evaluation file; the discrepancy should be resolved before
+treating the two score sources as interchangeable.
+
+
+### Selected SE Variant
+
+The selected SE variant for Person 2 is candidate-aware Semantic Entropy using the `anchor_v1` short-answer anchoring matcher, subject to team review. Global SE is retained as the reference baseline. Candidate-split experiments are exploratory only and must not be used for final reported results.
+
 ## 7. Experimental Follow-Up: Short-Answer Anchoring Matcher
 A short-answer anchoring fallback was added to `src/detectors/semantic_entropy/nli_equivalence.py`. Saved generations from the existing validation checkpoint were rescored without regenerating answers.
 
@@ -347,7 +365,7 @@ These checks are useful but do not alone prove complete provenance, unique IDs, 
 
 - The controlled set controls answer length within a pair, not every confounder; some pairs may use different questions.
 
-- Global SE has AUROC close to 0.5 on the full test split and below 0.5 on the controlled subset; investigate its validation behavior and score semantics.
+- Global SE has AUROC close to 0.5 on the full test split (0.4962) and the controlled subset (0.4450). These results indicate near-random ranking in this evaluation; the cause requires further investigation.
 
 - Candidate-aware SE still produces false positives and false negatives.
 
@@ -360,7 +378,7 @@ These checks are useful but do not alone prove complete provenance, unique IDs, 
 - Local backups, diagnostics, and generated outputs should be reviewed before committing. Avoid broad staging commands such as `git add .`.
 
 ## 10. Git and Publication Status
-The latest confirmed commit is `870acad`, pushed to `origin/person2/semantic-entropy`.
+The latest confirmed commit is `0e1dec2`, pushed to `origin/person2/semantic-entropy`.
 
 The length-controlled evaluation artifacts were committed and pushed. Full-test anchoring evaluation artifacts were also recorded as committed and pushed in the current work history.
 
@@ -406,7 +424,7 @@ Stage only explicitly reviewed files by their paths. Do not stage or delete all 
 - [ ] Review remaining local untracked artifacts before any further publication.
 
 ## 12. Safe Teammate Summary
-The Person 2 Semantic Entropy workstream has an implemented and tested detector pipeline, a resumable validation runner, and a resumable length-controlled test runner. The recorded configuration is `435a3e4fb7b8`, prompt version `v1`, using Llama 3.2 3B Instruct NF4 on HaluEval QA. The latest recorded regression run passed 150 tests.
+The Person 2 Semantic Entropy workstream has an implemented and tested detector pipeline, a resumable validation runner, and a resumable length-controlled test runner. The recorded configuration is `435a3e4fb7b8`, prompt version `v1`, using Llama 3.2 3B Instruct NF4 on HaluEval QA. The latest recorded regression run passed 173 tests in 218.44 seconds.
 
 Full validation completed over 1,001 pairs. The global threshold was `0.1625414866957241` with validation Youden J `0.0`; the candidate-aware threshold was `0.95` with validation Youden J `0.6313686313686313`. The anchoring variant's validation threshold was also `0.95`, with validation Youden J `0.714286`.
 
@@ -422,7 +440,7 @@ Thresholds were selected using validation data only. Candidate-aware scoring mer
 
 - `outputs/evaluation/se_candidate_length_controlled_lc_full_v1.json`
 
-**Latest confirmed commit:** `870acad` — `fix: finalize semantic entropy evaluation metadata`
+**Latest confirmed commit:** `0e1dec2` — `docs: clarify exploratory semantic entropy evaluation`
 
 ## Full Test Evaluation — 18 October 2026
 ### Evaluation protocol

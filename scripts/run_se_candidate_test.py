@@ -1,8 +1,10 @@
 
-"""Evaluate semantic entropy on the leakage-safe candidate test split.
+"""EXPLORATORY ONLY: evaluate semantic entropy on the candidate test split.
 
-Thresholds are loaded from the completed validation-only selection artifact.
-Original test runners and outputs are not modified.
+This proposed split is not the official evaluation split and must not be used
+for final results. The official split remains frozen. Thresholds are loaded
+from the validation-only selection artifact. Original test runners and
+outputs are not modified.
 """
 from __future__ import annotations
 

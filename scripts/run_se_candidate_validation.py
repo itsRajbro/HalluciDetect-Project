@@ -1,5 +1,9 @@
 
-"""Resumable candidate-split validation runner for semantic entropy."""
+"""EXPLORATORY ONLY: resumable validation runner for the proposed candidate split.
+
+This split is not official and must not be used for final results. The
+official split and frozen evaluation configuration remain unchanged.
+"""
 from __future__ import annotations
 
 import argparse
