@@ -267,7 +267,6 @@ def run(pair_limit: int, tag: str) -> None:
                 "pair_id": pair_id,
                 "pair_generation_shared": True,
                 "generation_seed_key": pair_id,
-                "candidate_label": sample.label,
                 "candidate_matched": candidate["candidate_matched"],
                 "candidate_cluster_probability": candidate[
                     "candidate_cluster_probability"

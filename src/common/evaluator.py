@@ -43,6 +43,8 @@ from src.common.data import Sample, group_by_match, group_by_pair
 
 CRITERIA = ("youden", "f1", "accuracy")
 
+MIN_CLASS_FOR_AUROC = 30
+
 
 # ---------------------------------------------------------------------------
 # 0. Records -> scores
@@ -255,17 +257,26 @@ def length_stratified(
         last = b == len(edges) - 2
         label = f"[{edges[b]:g}, {edges[b + 1]:g}{']' if last else ')'}"
         if not mask.any():
-            out.append({"bin": label, "n": 0})
+            out.append({
+                "bin": label,
+                "n": 0,
+                "n_pos": 0,
+                "n_neg": 0,
+                "n_min": 0,
+                "auroc": None,
+                "auroc_reliable": False,
+            })
             continue
         m = compute_metrics(y[mask], (x[mask] >= threshold).astype(int), x[mask])
-        out.append({"bin": label, "n": m["n"], "n_pos": m["n_pos"], "n_neg": m["n_neg"],
+        out.append({"bin": label, "n": m["n"], "n_pos": m["n_pos"], "n_neg": m["n_neg"],"n_min": min(m["n_pos"], m["n_neg"]),
+                    "auroc_reliable": min(m["n_pos"], m["n_neg"]) >= MIN_CLASS_FOR_AUROC,
                     "frac_hallucinated": m["n_pos"] / m["n"], "accuracy": m["accuracy"],
                     "recall": m["recall"], "specificity": m["specificity"], "auroc": m["auroc"]})
     return out
 
 
 def error_analysis(samples: Sequence[Sample], y: np.ndarray, x: np.ndarray, threshold: float,
-                   *, top_k: int = 10, max_chars: int = 200) -> dict:
+                   *, top_k: int = 10, max_chars: Optional[int] = None) -> dict:
     """Most confident false positives / false negatives, plus length by outcome."""
     pred = (x >= threshold).astype(int)
     lengths = np.array([s.answer_length_chars for s in samples], float)
@@ -278,10 +289,26 @@ def error_analysis(samples: Sequence[Sample], y: np.ndarray, x: np.ndarray, thre
     def rows(mask, descending):
         order = np.argsort(-x if descending else x, kind="stable")
         picked = [i for i in order if mask[i]][:top_k]
-        return [{"sample_id": samples[i].sample_id, "pair_id": samples[i].pair_id, "score": float(x[i]),
-                 "answer_length_chars": samples[i].answer_length_chars,
-                 "question": samples[i].question[:max_chars], "answer": samples[i].answer[:max_chars]}
-                for i in picked]
+        result = []
+        for i in picked:
+            question = samples[i].question
+            answer = samples[i].answer
+
+            if max_chars is not None:
+                question = question[:max_chars]
+                answer = answer[:max_chars]
+
+            result.append({
+                "sample_id": samples[i].sample_id,
+                "pair_id": samples[i].pair_id,
+                "score": float(x[i]),
+                "answer_length_chars": samples[i].answer_length_chars,
+                "question": question,
+                "answer": answer,
+            })
+
+        return result
+
 
     return {"length_by_outcome": length_by_outcome,
             "top_false_positives": rows(groups["FP"], True),    # factual answers scored most hallucinated
@@ -304,6 +331,49 @@ def _split_report(samples, scored, threshold, *, n_bins, top_k, edges=None, nati
         rep["metrics_native_pred_label"] = compute_metrics(y, npred, x)
     return rep
 
+def _bootstrap_confidence_intervals(
+    y, pred, scores, group_ids, *, n_boot=1000, seed=42, cluster="pair"
+) -> dict:
+    """Percentile confidence intervals from a cluster bootstrap."""
+    y = np.asarray(y, dtype=int)
+    pred = np.asarray(pred, dtype=int)
+    scores = np.asarray(scores, dtype=float)
+    group_ids = np.asarray(group_ids)
+
+    unique_groups = np.unique(group_ids)
+    if n_boot <= 0 or len(unique_groups) == 0:
+        return {}
+
+    rng = np.random.default_rng(seed)
+    metric_names = ("accuracy", "precision", "recall", "f1", "auroc")
+    values = {name: [] for name in metric_names}
+
+    for _ in range(n_boot):
+        chosen = rng.choice(unique_groups, size=len(unique_groups), replace=True)
+        # Repeated groups are intentionally repeated in the bootstrap sample.
+        indices = np.concatenate([
+            np.flatnonzero(group_ids == group_id) for group_id in chosen
+        ])
+
+        metrics = compute_metrics(y[indices], pred[indices], scores[indices])
+        for name in metric_names:
+            value = metrics.get(name)
+            if value is not None and np.isfinite(value):
+                values[name].append(float(value))
+
+    intervals = {}
+    for name, vals in values.items():
+        if vals:
+            intervals[name] = {
+                "lo": float(np.percentile(vals, 2.5)),
+                "hi": float(np.percentile(vals, 97.5)),
+            }
+
+    return {
+        "n_boot": int(n_boot),
+        "cluster": cluster,
+        "metrics": intervals,
+    }
 
 def evaluate_detector(
     detector_name: str,
@@ -318,6 +388,7 @@ def evaluate_detector(
     n_bins: int = 4,
     top_k: int = 10,
     config_hash: Optional[str] = None,
+    n_boot: int = 1000,
 ) -> dict:
     """Full evaluation of one detector. Returns a JSON-serializable report.
 
@@ -352,11 +423,59 @@ def evaluate_detector(
         report["validation"] = _split_report(val_samples, val_scored, t, n_bins=n_bins, top_k=top_k, edges=edges)
     report["test"] = _split_report(test_samples, test_scored, t, n_bins=n_bins, top_k=top_k, edges=edges)
 
-    if ctrl_samples is not None:
-        yc, xc = align(ctrl_samples, test_scored, allow_extra=True)
-        report["length_controlled"] = {
-            "metrics": compute_metrics(yc, (xc >= t).astype(int), xc),
-            "match_level": match_level(ctrl_samples, test_scored)}
+    if n_boot > 0:
+        # Validation confidence intervals: resample complete pairs.
+        if val_samples is not None and val_scored is not None:
+            yv, xv = align(val_samples, val_scored)
+            pv = (xv >= t).astype(int)
+            report["validation"]["confidence_intervals"] = (
+                _bootstrap_confidence_intervals(
+                    yv,
+                    pv,
+                    xv,
+                    [s.pair_id for s in val_samples],
+                    n_boot=n_boot,
+                    seed=42,
+                    cluster="pair",
+                )
+            )
+
+        # Test confidence intervals: resample complete pairs.
+        yt, xt = align(test_samples, test_scored)
+        pt = (xt >= t).astype(int)
+        report["test"]["confidence_intervals"] = (
+            _bootstrap_confidence_intervals(
+                yt,
+                pt,
+                xt,
+                [s.pair_id for s in test_samples],
+                n_boot=n_boot,
+                seed=43,
+                cluster="pair",
+            )
+        )
+
+        if ctrl_samples is not None:
+            yc, xc = align(ctrl_samples, test_scored, allow_extra=True)
+            pc = (xc >= t).astype(int)
+
+            report["length_controlled"] = {
+                "metrics": compute_metrics(yc, pc, xc),
+                "match_level": match_level(ctrl_samples, test_scored),
+            }
+
+            if n_boot > 0:
+                report["length_controlled"]["confidence_intervals"] = (
+                    _bootstrap_confidence_intervals(
+                        yc,
+                        pc,
+                        xc,
+                        [s.match_id for s in ctrl_samples],
+                        n_boot=n_boot,
+                        seed=44,
+                        cluster="match",
+                    )
+                )
 
     runtimes = [v["runtime_sec"] for v in test_scored.values() if v["runtime_sec"] is not None]
     if runtimes:

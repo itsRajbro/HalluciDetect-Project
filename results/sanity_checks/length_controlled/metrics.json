@@ -1,0 +1,17 @@
+{
+  "experiment": "greedy_one_to_one_char_length_matching",
+  "matching_rule": "closest absolute character length, no replacement",
+  "test_rows": 2000,
+  "matched_pairs": 1000,
+  "matched_rows": 2000,
+  "unmatched_label_0": 0,
+  "unmatched_label_1": 0,
+  "mean_absolute_character_length_difference": 51.219,
+  "median_absolute_character_length_difference": 43.0,
+  "mean_absolute_word_count_difference": 8.541,
+  "median_absolute_word_count_difference": 7.0,
+  "matched_auroc": 0.9995539999999998,
+  "matched_accuracy_at_original_threshold": 0.989,
+  "threshold": 0.9854559515186279,
+  "note": "Greedy matching is order-dependent and is not guaranteed to find the globally optimal set of matches."
+}

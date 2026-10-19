@@ -1,0 +1,92 @@
+{
+  "train_rows": 15998,
+  "test_rows": 2000,
+  "results_sorted_by_auroc": [
+    {
+      "feature": "ends_punctuation",
+      "test_auroc": 0.9674999999999999,
+      "test_accuracy": 0.9675
+    },
+    {
+      "feature": "word_count",
+      "test_auroc": 0.9669479999999999,
+      "test_accuracy": 0.943
+    },
+    {
+      "feature": "char_count",
+      "test_auroc": 0.966518,
+      "test_accuracy": 0.931
+    },
+    {
+      "feature": "period_ratio",
+      "test_auroc": 0.9548359999999998,
+      "test_accuracy": 0.937
+    },
+    {
+      "feature": "unique_char_ratio",
+      "test_auroc": 0.9547315,
+      "test_accuracy": 0.9095
+    },
+    {
+      "feature": "whitespace_ratio",
+      "test_auroc": 0.8927354999999999,
+      "test_accuracy": 0.844
+    },
+    {
+      "feature": "punctuation_ratio",
+      "test_auroc": 0.8323854999999999,
+      "test_accuracy": 0.7575
+    },
+    {
+      "feature": "lowercase_ratio",
+      "test_auroc": 0.7701545,
+      "test_accuracy": 0.78
+    },
+    {
+      "feature": "uppercase_ratio",
+      "test_auroc": 0.7034974999999999,
+      "test_accuracy": 0.719
+    },
+    {
+      "feature": "starts_uppercase",
+      "test_auroc": 0.6154999999999999,
+      "test_accuracy": 0.6155
+    },
+    {
+      "feature": "avg_word_length",
+      "test_auroc": 0.565074,
+      "test_accuracy": 0.5815
+    },
+    {
+      "feature": "question_mark_ratio",
+      "test_auroc": 0.5005,
+      "test_accuracy": 0.5005
+    },
+    {
+      "feature": "exclamation_ratio",
+      "test_auroc": 0.500494,
+      "test_accuracy": 0.5005
+    },
+    {
+      "feature": "parenthesis_ratio",
+      "test_auroc": 0.4990235,
+      "test_accuracy": 0.499
+    },
+    {
+      "feature": "non_ascii_ratio",
+      "test_auroc": 0.4893425,
+      "test_accuracy": 0.489
+    },
+    {
+      "feature": "digit_ratio",
+      "test_auroc": 0.4740170000000001,
+      "test_accuracy": 0.5005
+    },
+    {
+      "feature": "comma_ratio",
+      "test_auroc": 0.43466649999999996,
+      "test_accuracy": 0.428
+    }
+  ],
+  "note": "Single-feature diagnostic. High AUROC indicates association, not causal leakage."
+}
