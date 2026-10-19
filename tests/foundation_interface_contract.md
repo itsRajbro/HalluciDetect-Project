@@ -43,15 +43,17 @@ Rules: nobody calls `AutoModelForCausalLM.from_pretrained`, `model.generate`, or
 - Every record carries `config_hash` and `prompt_version`. `evaluate_run` rejects validation/test runs that differ in detector, variant, config hash, or prompt version.
 - A failed sample is never dropped silently: decide how it is scored, write it. The schema rejects NaN/inf, the evaluator rejects missing samples.
 
-## 3. Bar to beat: length-only baseline (real results at freeze)
+## 3. Reference results (verified against the committed run files)
 
-| | AUROC | Accuracy | F1 | Pair accuracy |
-|---|---|---|---|---|
-| Validation | 0.9727 | 0.9446 | 0.9444 | 0.9700 |
-| **Test** | **0.9665** | 0.9345 | 0.9345 | 0.9705 |
-| **Length-controlled set (274)** | **0.5097** | 0.5219 | n/a | 0.5876 (match-level) |
+| Detector | Test AUROC | Length-controlled AUROC (274 samples) |
+|---|---|---|
+| Length only (threshold 27.5 characters) | 0.9665 | 0.5097 [0.505, 0.518] |
+| Transformer, answer text only | 0.9855 | 0.8375 [0.790, 0.885] |
+| Candidate-aware SE (anchored matcher) | 0.8583 | 0.7512 (baseline matcher: 0.7472) |
+| Transformer, question + answer + knowledge | 0.9994 | 0.9899 [0.977, 0.999] |
+| SEP (mean_answer, layer 16) | 0.9996 | 0.9947 [0.987, 0.9995] |
 
-Threshold: 27.5 characters, selected on validation (Youden). Answer length alone separates the classes at 0.97 AUROC, so a detector's full-test score means little by itself. **Judge detectors on the length-controlled set and the length-stratified results** (and report confidence intervals: the controlled set has only 274 samples, roughly +/-0.07 on AUROC). Pair accuracy is NOT length-controlled: within a pair the hallucinated answer is almost always the longer one.
+Answer length alone separates the classes at 0.97 AUROC on the full test set, so a detector's full-test score means little by itself. **Judge detectors on the length-controlled set and the length-stratified results**, and always report confidence intervals. On the length-controlled set a detector must beat the answer-only row (0.84) to show it uses more than the form of the answer. Pair accuracy is NOT length-controlled: within a pair the hallucinated answer is almost always the longer one. The SE control-set value uses the anchored full-test scores restricted to the 274 control samples.
 
 ## 4. Usage recipes
 
@@ -152,4 +154,32 @@ Hidden-state layers and poolings are **not** frozen choices: Person 3 selects th
 - A change to anything in sections 1 or 2 needs agreement from all three people.
 - A change that alters results (prompt text, generation settings, model revision, split, length definition) requires a new `config_hash` or `prompt_version`, and affected detectors must be re-run before results are compared.
 - Bug fixes that change no result can be merged normally with tests passing.
-- Never edit `src/data/split.py` or its ratios. A different split invalidates every result.
+- Never edit `src/data/split.py` or its ratios. A different split invalidates every result (see section 9 for the decision on the candidate split).
+
+## 9. Split decision (2026-10-19)
+
+**The official split is final.** It is pinned by `data/split_manifest.json`: seed 42, 7,999 / 1,001 / 1,000 pairs (15,998 / 2,002 / 2,000 samples). Content hashes of the processed files (CRLF-normalised):
+
+| Split | SHA-256 |
+|---|---|
+| train | `3d975f8bbb7fe02e4b41530842b264da39a0aaff9bdf625523b16fc06fe83de2` |
+| validation | `90166289346cc1a0ef505de47ae14113698b60430e1162640bd96c66ae55361d` |
+| test | `f4900457f908284a28541bec54c5bbd13b32066f4e39fc23ca49e4ed99e9bff8` |
+
+**The candidate split is not adopted.** The split proposed after the SEP leakage audit (`results/leakage_audit/proposed_split/candidate_manifest.json`: 7,979 / 1,011 / 1,010 pairs, 22 pairs moved) stays in the repo as an exploratory artifact only. Sample IDs are identical in both splits, so nothing can be mis-joined, but no result may be reported on it.
+
+Reasons:
+1. The audit shows the SEP result does not depend on the overlap: AUROC 0.99955 on the official test set, 0.99955 excluding the 10 test pairs whose knowledge passage appears in train, and 0.99927 on the 722 test pairs without knowledge or answer overlap.
+2. Adopting it would mean retraining both Transformer baselines and the SEP probe (they trained on the official train set, which contains the 11 pairs the candidate split moves into test), a new manifest and tag, and re-evaluating every detector.
+
+**Reporting rule.** Every detector, including the hybrid, is reported on:
+- (a) the official test set (primary), and
+- (b) the official test set **excluding the pairs whose knowledge passage also appears in train** (10 pairs), as the leakage-robustness view.
+- A secondary robustness check excludes the 278 pairs with knowledge or answer overlap.
+
+Exclusion lists are exported by Person 3 to `results/leakage_audit/exclusions/` as lists of official `pair_id`s (`test_pairs_train_seen_knowledge.json` and `test_pairs_knowledge_or_answer_overlap.json`). A pair is excluded as a whole (both of its samples).
+
+**Scope.** The SE candidate-split runners (`scripts/run_se_candidate_*.py`) are exploratory and must not be used for final results. The audit is exact-match only; a near-duplicate check is added by Person 3 and its result stated in the SEP report.
+
+**Revisiting this decision** needs agreement from all three people, a retraining plan for every supervised detector, and a new manifest and tag.
+
