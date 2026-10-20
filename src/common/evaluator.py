@@ -74,11 +74,13 @@ def records_to_scores(records: Iterable[Any]) -> dict[str, dict]:
         pl = _get(r, "pred_label")
         if pl is not None and int(pl) not in (0, 1):
             raise ValueError(f"{sid}: pred_label {pl!r} not in {{0,1}}")
+        extra = _get(r, "extra")
+        pid = extra.get("pair_id") if isinstance(extra, dict) else None
         rt = _get(r, "latency_s")            # Step 8 schema name
         if rt is None:
             rt = _get(r, "runtime_sec")      # legacy / ad-hoc name
         out[sid] = {"score": score, "pred_label": None if pl is None else int(pl),
-                    "runtime_sec": rt,
+                    "runtime_sec": rt, "pair_id": pid,
                     "n_generations": _get(r, "n_generations"),
                     "n_generated_tokens": _get(r, "n_generated_tokens"),
                     "peak_gpu_mem_mb": _get(r, "peak_gpu_mem_mb")}
@@ -227,6 +229,57 @@ def match_level(ctrl_samples: Sequence[Sample], scored: dict[str, dict]) -> dict
     n = len(matches)
     return {"n_matches": n, "match_accuracy": (wins + 0.5 * ties) / n if n else None, "n_ties": int(ties)}
 
+
+def _bootstrap_confidence_intervals(
+    y: np.ndarray,
+    pred: np.ndarray,
+    scores: np.ndarray,
+    groups: Sequence[Any],
+    *,
+    n_boot: int = 1000,
+    seed: int = 42,
+) -> dict:
+    """Percentile bootstrap CIs, resampling whole groups."""
+    if n_boot <= 0:
+        return {}
+
+    rng = np.random.default_rng(seed)
+    y = np.asarray(y, dtype=int)
+    pred = np.asarray(pred, dtype=int)
+    scores = np.asarray(scores, dtype=float)
+    groups = np.asarray(groups)
+
+    unique_groups = np.unique(groups)
+    values = {
+        name: []
+        for name in ("accuracy", "precision", "recall", "f1", "auroc")
+    }
+
+    for _ in range(n_boot):
+        chosen = rng.choice(unique_groups, size=len(unique_groups), replace=True)
+        indices = np.concatenate([
+            np.flatnonzero(groups == group) for group in chosen
+        ])
+
+        metrics = compute_metrics(y[indices], pred[indices], scores[indices])
+        for name in values:
+            value = metrics[name]
+            if value is not None and np.isfinite(value):
+                values[name].append(float(value))
+
+    intervals = {}
+    for name, samples in values.items():
+        if samples:
+            lo, hi = np.percentile(samples, [2.5, 97.5])
+            intervals[name] = {"lo": float(lo), "hi": float(hi)}
+        else:
+            intervals[name] = {"lo": None, "hi": None}
+
+    return {
+        "n_boot": n_boot,
+        "cluster": "pair",
+        "metrics": intervals,
+    }
 
 def length_edges(lengths: np.ndarray, n_bins: int = 4) -> list[float]:
     """Quantile bin edges (de-duplicated). Compute once and reuse across detectors."""
@@ -389,6 +442,7 @@ def evaluate_detector(
     top_k: int = 10,
     config_hash: Optional[str] = None,
     n_boot: int = 1000,
+    cost_unit: str = "sample",
 ) -> dict:
     """Full evaluation of one detector. Returns a JSON-serializable report.
 
@@ -477,13 +531,30 @@ def evaluate_detector(
                     )
                 )
 
-    runtimes = [v["runtime_sec"] for v in test_scored.values() if v["runtime_sec"] is not None]
+    # cost_unit="pair": the detector generated ONCE per question pair and wrote the same cost on both
+    # samples of the pair (e.g. the SE pair runner). Count each pair once, or the cost is doubled.
+    cost_items = list(test_scored.values())
+    if cost_unit not in ("sample", "pair"):
+        raise ValueError("cost_unit must be 'sample' or 'pair'")
+    if cost_unit == "pair":
+        if any(v.get("pair_id") is None for v in cost_items):
+            warnings.append("cost_unit='pair' but records have no extra.pair_id: costs counted per sample (overstated)")
+            cost_unit = "sample"
+        else:
+            seen, uniq = set(), []
+            for v in cost_items:
+                if v["pair_id"] not in seen:
+                    seen.add(v["pair_id"])
+                    uniq.append(v)
+            cost_items = uniq
+    runtimes = [v["runtime_sec"] for v in cost_items if v["runtime_sec"] is not None]
     if runtimes:
-        eff = {"test_total_runtime_sec": float(sum(runtimes)),
-               "test_mean_runtime_sec_per_sample": float(sum(runtimes) / len(runtimes))}
-        gens = [v["n_generations"] for v in test_scored.values() if v["n_generations"] is not None]
-        toks = [v["n_generated_tokens"] for v in test_scored.values() if v["n_generated_tokens"] is not None]
-        mems = [v["peak_gpu_mem_mb"] for v in test_scored.values() if v["peak_gpu_mem_mb"] is not None]
+        per_sample_denominator = len(test_scored) if cost_unit == "pair" else len(runtimes)
+        eff = {"cost_unit": cost_unit, "test_total_runtime_sec": float(sum(runtimes)),
+               "test_mean_runtime_sec_per_sample": float(sum(runtimes) / per_sample_denominator)}
+        gens = [v["n_generations"] for v in cost_items if v["n_generations"] is not None]
+        toks = [v["n_generated_tokens"] for v in cost_items if v["n_generated_tokens"] is not None]
+        mems = [v["peak_gpu_mem_mb"] for v in cost_items if v["peak_gpu_mem_mb"] is not None]
         if gens:
             eff["test_total_generations"] = int(sum(gens))
         if toks:
@@ -514,6 +585,7 @@ def evaluate_run(
     criterion: str = "youden",
     n_bins: int = 4,
     top_k: int = 10,
+    n_boot: int = 1000,
     save: bool = False,
     out_path=None,
 ) -> dict:
@@ -571,7 +643,9 @@ def evaluate_run(
     report = evaluate_detector(
         name, test_samples=test_samples, test_records=test_recs,
         val_samples=val_samples, val_records=val_recs, threshold=threshold, criterion=criterion,
-        ctrl_samples=ctrl_samples, n_bins=n_bins, top_k=top_k, config_hash=test_meta.config_hash)
+        ctrl_samples=ctrl_samples, n_bins=n_bins, top_k=top_k, config_hash=test_meta.config_hash,
+        n_boot=n_boot,
+        cost_unit="pair" if (test_meta.extra or {}).get("generation_statistics_unit") == "pair" else "sample")
     report["prompt_version"] = test_meta.prompt_version
     if threshold_from_meta:
         report["threshold"]["criterion"] = "stored_in_run_meta"

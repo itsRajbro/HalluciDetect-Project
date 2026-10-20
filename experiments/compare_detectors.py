@@ -14,6 +14,10 @@ Output
   3. error overlap on the test set: who is right where, McNemar test, and the
      accuracy of an oracle that is right whenever any detector is
 Use --out to save everything as JSON.
+
+--scope controlled   compare on the length-controlled set ONLY. Use it when some run (e.g. SE, or a hybrid that
+                     contains SE) was scored only on the 274 control samples: every run must then cover the
+                     control set (it may cover more). Test-set metrics and the full-test error overlap are skipped.
 """
 from __future__ import annotations
 
@@ -59,6 +63,8 @@ def main(argv=None) -> int:
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=None, help="save the full results as JSON")
+    ap.add_argument("--scope", choices=["test", "controlled"], default="test",
+                    help="'controlled': compare on the length-controlled set only (runs may cover just that set)")
     args = ap.parse_args(argv)
 
     cfg = get_config()
@@ -73,6 +79,9 @@ def main(argv=None) -> int:
     except FileNotFoundError:
         ctrl = None
         print("note: length-controlled set not found; skipping it\n")
+    if args.scope == "controlled" and ctrl is None:
+        raise SystemExit("--scope controlled needs the length-controlled set (data/processed/test_length_controlled.jsonl)")
+    universe = ctrl if args.scope == "controlled" else test
 
     runs: dict = {}
     for spec in names:
@@ -81,7 +90,16 @@ def main(argv=None) -> int:
             raise SystemExit(f"{spec}: not a test run")
         if meta.threshold is None:
             raise SystemExit(f"{spec}: run has no validation threshold (write it with threshold=...)")
-        check_coverage(recs, [s.sample_id for s in test], strict=True)
+        if args.scope == "controlled":
+            missing = check_coverage(recs, [s.sample_id for s in ctrl], strict=False)["missing"]
+            if missing:
+                raise SystemExit(f"{spec}: {len(missing)} of {len(ctrl)} length-controlled samples have no score")
+        else:
+            try:
+                check_coverage(recs, [s.sample_id for s in test], strict=True)
+            except ValueError as e:
+                raise SystemExit(f"{spec}: {e}\nIf this run covers only the length-controlled samples "
+                                 f"(e.g. SE, or a hybrid containing SE), add:  --scope controlled")
         runs[spec] = {"scored": E.records_to_scores(recs), "thr": meta.threshold, "meta": meta}
     hashes = {(r["meta"].config_hash, r["meta"].prompt_version) for r in runs.values()}
     if len(hashes) > 1:
@@ -96,11 +114,13 @@ def main(argv=None) -> int:
     print(f"1. Metrics with 95% bootstrap CIs (n_boot={args.n_boot}; resampling question pairs / matches)")
     print("=" * 100)
     for n, r in runs.items():
-        ci_t = C.bootstrap_ci(test, r["scored"], r["thr"], cluster="pair", n_boot=args.n_boot, seed=args.seed)
-        entry = {"threshold": r["thr"], "test": ci_t}
-        m = ci_t["metrics"]
+        entry = {"threshold": r["thr"]}
         print(f"\n{n}   (threshold {r['thr']:.4g}, selected on validation)")
-        print(f"  test      AUROC {_fmt(m['auroc'])}   acc {_fmt(m['accuracy'])}   pair_acc {_fmt(m['pair_accuracy'])}")
+        if args.scope == "test":
+            ci_t = C.bootstrap_ci(test, r["scored"], r["thr"], cluster="pair", n_boot=args.n_boot, seed=args.seed)
+            entry["test"] = ci_t
+            m = ci_t["metrics"]
+            print(f"  test      AUROC {_fmt(m['auroc'])}   acc {_fmt(m['accuracy'])}   pair_acc {_fmt(m['pair_accuracy'])}")
         if ctrl is not None:
             ci_c = C.bootstrap_ci(ctrl, r["scored"], r["thr"], cluster="match", n_boot=args.n_boot, seed=args.seed)
             entry["length_controlled"] = ci_c
@@ -116,7 +136,7 @@ def main(argv=None) -> int:
         for n in others:
             res = {}
             for label, samples, cluster in (("test", test, "pair"), ("length_controlled", ctrl, "match")):
-                if samples is None:
+                if samples is None or (args.scope == "controlled" and label == "test"):
                     continue
                 d = C.paired_bootstrap_diff(samples, runs[n]["scored"], runs[ref]["scored"], runs[n]["thr"],
                                             runs[ref]["thr"], cluster=cluster, n_boot=args.n_boot, seed=args.seed)
@@ -130,10 +150,11 @@ def main(argv=None) -> int:
 
     if len(runs) > 1:
         print("\n" + "=" * 100)
-        print("3. Error overlap on the test set")
+        print("3. Error overlap on the " + ("length-controlled set" if args.scope == "controlled" else "test set"))
         print("=" * 100)
-        ov = C.error_overlap(test, {n: (r["scored"], r["thr"]) for n, r in runs.items()})
+        ov = C.error_overlap(universe, {n: (r["scored"], r["thr"]) for n, r in runs.items()})
         results["error_overlap_test"] = ov
+        results["scope"] = args.scope
         for pair, v in ov["pairwise"].items():
             keys = [k for k in v if k.startswith("only_")]
             print(f"\n{pair}:  both right {v['both_right']}, both wrong {v['both_wrong']}, "

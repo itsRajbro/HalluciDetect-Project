@@ -74,9 +74,13 @@ AUROC, accuracy, F1, pair/match accuracy on test and on the length-controlled se
 - The length-controlled set (274 samples) is small; confidence intervals will be wide for detectors with AUROC well below 0.99.
 - The Transformer baselines reach 0.99 on the length-controlled set, so SE, SEP and the hybrid are expected to rank below the supervised model; the comparison of interest is among SE, SEP and the hybrid, and against the length-only and answer-only bars.
 - Global SE cannot separate the two answers of a question (section 2).
+- SEP, as implemented, is a label-supervised probe on Llama hidden states (a supervised detector, like the Transformer baselines), not an uncertainty estimate; its inputs include the answer tokens, so the length and answer-form checks of section 7 matter for it in particular.
 
 ## 10. Amendment log
 
 | Date | Change | Reason | Made before seeing test results? |
 |---|---|---|---|
-| | | | |
+| 2026-10-14 | Probability-valued inputs (SEP) are fused in logit space: `logit(clip(p, 1e-12, 1-1e-12))`, then standardized. Other inputs (SE) are used as they are. | Review of the SEP hand-off showed saturated probabilities (decision threshold about 0.985, reported test AUROC 0.9996); standardizing raw probabilities leaves almost no usable variation. | Yes: no fusion has been run |
+| 2026-10-14 | Inputs without an owner-selected threshold (the SE runners select none) get a Youden threshold chosen on their validation scores. It is used only for accuracy-style numbers; AUROC comparisons do not depend on it. | The SE runners write scores only and no threshold. | Yes |
+| 2026-10-14 | Partial coverage is allowed (`--allow-partial`): the fusion is fitted on the validation samples covered by every input (at least 100 question pairs), and the hybrid is scored and evaluated on the test samples covered by every input. If SE covers only the 274 length-controlled test samples, claims are restricted to that set (the primary decision is already defined on it); full-test metrics are then not reported for the hybrid. | The SE test runner scores only the length-controlled set (cost); the fit uses whatever validation pairs SE has. | Yes: no fusion has been run |
+| 2026-10-14 | Pair-level generation cost (SE writes the same cost on both samples of a pair) is counted once per pair in efficiency reporting. | Evaluator bug fix, not an analysis choice: without it SE's cost is doubled. | Yes (no effect on any score) |
