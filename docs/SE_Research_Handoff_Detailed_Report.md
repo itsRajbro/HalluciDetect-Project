@@ -240,18 +240,11 @@ Candidate-aware SE outperformed global SE on this controlled subset. However, it
 Matched pairs control answer length within a pair, not all confounders. Some pairs may use different original questions, so matched-pair metrics require cautious interpretation. The controlled subset should not be treated as a replacement for the full test split.
 
 ### Global SE Controlled-Subset Score Discrepancy
+A verification compared two saved score sources on the same 274 length-controlled samples. The dedicated `lc_full_v1` run gives AUROC **0.4450423571**, while restricting the full-test scores to those same samples gives AUROC **0.4460546646**. The two score sources differ for one sample, `S009097_0`; the other 273 scores match. The dedicated run metadata records `sample_id` as the generation seed key and `match_id_used_for_generation` as `false`.
 
-A verification compared two saved score sources on the same 274 length-controlled
-samples. The dedicated `lc_full_v1` run gives AUROC **0.4450423571**, while
-restricting the full-test scores to those same samples gives AUROC
-**0.4460546646**. The two score sources differ for one sample, `S009097_0`;
-the other 273 scores match. The dedicated run metadata records `sample_id` as
-the generation seed key and `match_id_used_for_generation` as `false`.
-The reason for the single-sample score difference has not been established.
-The reported controlled-run metrics above remain tied to the dedicated
-length-controlled evaluation file; the discrepancy should be resolved before
-treating the two score sources as interchangeable.
+The reason for the single-sample score difference has not been established. The reported controlled-run metrics above remain tied to the dedicated length-controlled evaluation file; the discrepancy should be resolved before treating the two score sources as interchangeable.
 
+This discrepancy does not change the reported full-test results or establish that either score source is incorrect. Do not regenerate or overwrite existing runs solely to change this reporting note.
 
 ### Selected SE Variant
 
